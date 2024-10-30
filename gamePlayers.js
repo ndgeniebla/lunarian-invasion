@@ -280,7 +280,9 @@ class PlayerReimu extends PlayerChar {
        return new Promise((resolve) => {
            setTimeout(() => {
             //    console.log("blessing recovered");
-               new StatusText(this.pos, this, "HEALTH REGEN", 3.5, (new Color).setHex("#9cff19"));
+               if (!gameOver && gameStarted) {
+                   new StatusText(this.pos, this, "HEALTH REGEN", 3.5, (new Color).setHex("#9cff19"));
+               }
                this.wasHit = false;
                this.recoveringBlessing = false;
                resolve();

@@ -42,7 +42,7 @@ let sub1WaveButton = new Button(vec2(-1000, -1000));
 let sub5WaveButton = new Button(vec2(-1000, -1000));
 let sub25WaveButton = new Button(vec2(-1000, -1000));
 let maxPowerButton = new Button(vec2(-1000, -1000));
-let creditsButton = new Button(vec2(-1000, -1000));
+let instructionsButton = new Button(vec2(-1000, -1000));
 let startGameButton = new Button(vec2(-1000, -1000));
 let backButton = new Button(vec2(-1000, -1000));
 
@@ -50,7 +50,7 @@ const menuStates = {
     mainScreen: "mainScreen",
     characterSelect: "characterSelect",
     customGame: "customGame",
-    credits: "credits"
+    instructions: "instructions"
 }
 
 let menuState = "";
@@ -65,7 +65,7 @@ let characters = {
 let menuButtons = [ endlessButton, 
                     reimuButton, sakuyaButton, youmuButton, 
                     customGameButton, add1WaveButton, add5WaveButton, add25WaveButton, sub1WaveButton, sub5WaveButton, sub25WaveButton,
-                    creditsButton,
+                    instructionsButton,
                     startGameButton,
                     backButton
                   ];
@@ -181,10 +181,15 @@ function gameUpdate()
     
     if (startGameButton.selected && !gameStarted) {
         if (!characterSelected) {
-            drawText("Please select a character!", vec2(0, -18), 5, new Color(1, 0, 0), 0.4);
+            if (menuState === menuStates.characterSelect) {
+                drawText("Please select a character!", vec2(0, -14), 7, new Color(1, 0, 0), 0.4);
+            } else {
+                drawText("Please select a character!", vec2(0, -18), 5, new Color(1, 0, 0), 0.4);
+            }
         } else {
             prepGame();
             clearCurrentMenu();
+            cursor.destroy();
         }
     }
     
@@ -205,6 +210,22 @@ function gameUpdate()
         //but railgun lasers stop rendering if you drawGround() in gameRender() instead of gameUpdate()
         //Such a STUPID error/bug, but you gotta do what you gotta do.
         //Splitting the ground and the barrier rendering seems to have helped with the screen-tearing at least
+    }
+
+    if (gameOver && keyWasPressed("Enter")) {
+        console.log("hello");
+        gameStarted = false; 
+        gameOver = false;
+        cameraPos = vec2(0, 0);
+        engineObjects.forEach((obj) => {
+            obj.destroy();
+        })
+        waveInProgress = false;
+        waveNum = 1;
+        totalPoints = 0;
+        startGameButton.selected = false;
+        makeMenuScreen(menuStates.mainScreen);
+        cursor = new Cursor();
     }
 }
 
@@ -235,10 +256,7 @@ function gameRenderPost()
         playerHud();
 
         if (player.health <= 0) {
-            drawRect(vec2(0), levelSize.scale(2), (new Color).setHex("#520000").scale(1, 0.6));
-            drawTextScreen("Game Over!", vec2(mainCanvasSize.x / 2, mainCanvasSize.y / 2.7), 500, new Color(1, 0, 0), 20);
-            drawTextScreen(`Score: ${totalPoints}`, vec2(mainCanvasSize.x / 2, mainCanvasSize.y / 2.0), 200, (new Color).setHex("#ffd52b"), 20);
-            gameOver = true;
+            gameOverScreen();
         }
     }
     // drawTextScreen(player.health, vec2(mainCanvasSize.x/2, mainCanvasSize.y - 40), 60, new Color(255, 0, 0));

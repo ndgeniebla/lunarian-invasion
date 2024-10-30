@@ -226,12 +226,14 @@ class Cursor extends EngineObject {
         this.color = new Color(1, 0, 0, 0);
         this.renderOrder = 10;
         this.setCollision();
+        // this.mass = 0;
     }
     update() {
         this.pos.x = mousePos.x;
         this.pos.y = mousePos.y;
         
         this.pos.x = clamp(this.pos.x, -levelSize.x, levelSize.x);
+
         this.pos.y = clamp(this.pos.y, -levelSize.y, levelSize.y);
     }
     
@@ -258,10 +260,10 @@ function makeMenuScreen(state) {
             menuState = menuStates.mainScreen;
             endlessButton = new Button(vec2(0, 10), vec2(30, 10), "Endless Mode");
             customGameButton = new Button(vec2(0, -2), vec2(30, 10), "Custom Game");
-            creditsButton = new Button(vec2(0, -14), vec2(30, 10), "Credits")
+            instructionsButton = new Button(vec2(0, -14), vec2(30, 10), "How to Play")
             menuButtons.push(endlessButton);
             menuButtons.push(customGameButton);
-            menuButtons.push(creditsButton);
+            menuButtons.push(instructionsButton);
             break;
         case menuStates.characterSelect:
             menuState = menuStates.characterSelect;
@@ -326,10 +328,18 @@ function makeMenuScreen(state) {
             menuButtons.push(add25WaveButton);
             menuButtons.push(maxPowerButton);
             break;
-        case menuStates.credits:
-            menuState = menuStates.credits;
+        case menuStates.instructions:
+            menuState = menuStates.instructions;
             break;
     }
+}
+
+function gameOverScreen() {
+    drawRect(vec2(0), levelSize.scale(2), (new Color).setHex("#520000").scale(1, 0.6));
+    drawTextScreen("Game Over!", vec2(mainCanvasSize.x / 2, mainCanvasSize.y / 2.7), 500, new Color(1, 0, 0), 20);
+    drawTextScreen(`Score: ${totalPoints}`, vec2(mainCanvasSize.x / 2, mainCanvasSize.y / 2.0), 200, (new Color).setHex("#ffd52b"), 20);
+    drawTextScreen("Press Enter to go back to main menu", vec2(mainCanvasSize.x / 2, mainCanvasSize.y / 1.6), 150, new Color(1, 1, 1), 15);
+    gameOver = true;
 }
 
 function menuSelectionHandler() {
@@ -339,8 +349,8 @@ function menuSelectionHandler() {
                 makeMenuScreen(menuStates.characterSelect);
             } else if (customGameButton.selected) {
                 makeMenuScreen(menuStates.customGame);
-            } else if (creditsButton.selected) {
-                makeMenuScreen(menuStates.credits);
+            } else if (instructionsButton.selected) {
+                makeMenuScreen(menuStates.instructions);
             }
             break;
         case menuStates.characterSelect:
@@ -377,7 +387,7 @@ function menuSelectionHandler() {
             }
 
             break;
-        case menuStates.credits:
+        case menuStates.instructions:
             if (backButton.selected) {
                 makeMenuScreen(menuStates.mainScreen);
             }

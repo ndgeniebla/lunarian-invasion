@@ -3,7 +3,7 @@ async function spawnEnemy(enemyType, target, spawnDelay) {
     return new Promise((resolve) => {
         const randSpawn = vec2(rand(-levelSize.x/2 - 5, levelSize.x/2 - 5), rand(-levelSize.y/2 - 5, levelSize.y/2 - 5));
         setTimeout(() => {
-            if (timeStopped || gameOver) {
+            if (timeStopped || gameOver || !gameStarted) {
                 resolve("not spawned");
             } else {
                 console.log(`${enemyType.name} spawned`);
@@ -20,6 +20,10 @@ async function spawnEnemy(enemyType, target, spawnDelay) {
 async function spawnHandler(enemyType, spawnAmount, spawnDelay, target) {
     if (!spawnAmount) return; //prevents enemies from spawning that are not supposed to spawn
     for (let i = 0; i < spawnAmount; i++) {
+        if (gameOver || !gameStarted) {
+            return console.log("Game over! Enemy spawning stopped.");
+        }
+
         const result = await spawnEnemy(enemyType, target, spawnDelay);
         if (result === "not spawned") {
             i--;
