@@ -70,6 +70,8 @@ let menuButtons = [ endlessButton,
                     backButton
                   ];
 
+let characterInfo = [];
+
 // ==================================
 
 
@@ -179,7 +181,7 @@ function gameUpdate()
     
     if (startGameButton.selected && !gameStarted) {
         if (!characterSelected) {
-            drawText("Please select a character!", vec2(0, -15), 6, new Color(1, 0, 0), 0.4);
+            drawText("Please select a character!", vec2(0, -18), 5, new Color(1, 0, 0), 0.4);
         } else {
             prepGame();
             clearCurrentMenu();
