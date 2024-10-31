@@ -3,7 +3,7 @@ async function spawnEnemy(enemyType, target, spawnDelay) {
     return new Promise((resolve) => {
         const randSpawn = vec2(rand(-levelSize.x/2 - 5, levelSize.x/2 - 5), rand(-levelSize.y/2 - 5, levelSize.y/2 - 5));
         setTimeout(() => {
-            if (timeStopped || gameOver || !gameStarted) {
+            if (timeStopped || gameOver || !gameStarted || gamePaused) {
                 resolve("not spawned");
             } else {
                 console.log(`${enemyType.name} spawned`);

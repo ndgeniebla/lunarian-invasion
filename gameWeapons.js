@@ -35,7 +35,7 @@ class PlayerWeapon extends Weapon {
     update() {
         super.update();
         this.powerHandler();
-        if (mouseIsDown(0)) {
+        if (mouseIsDown(0) && !gamePaused) {
             this.host.attacking = true;
             //use the calcVel function to check direction
             const aimVec = calcVel2Pos(mousePos, cameraPos.x, cameraPos.y);
@@ -271,7 +271,7 @@ class EnemyGun extends EnemyWeapon {
     }
     update() {
         super.update();
-        if (this.frozen) {
+        if (this.frozen || gamePaused) {
             this.fireTimeBuffer = 0;
         } else if (this.fireTimeBuffer >= this.fireTimeCap) {
             // console.log(`EnemyGun: ${this.projectileTileInfo}`);
@@ -375,7 +375,7 @@ class EnemyRailgun extends EnemyWeapon {
         super.update();
         if (this.walkTime <= this.walkDelayCap) {
             this.walkTime++;
-        } else {
+        } else if (!this.frozen && !gamePaused) {
             this.fireTimeBuffer += this.fireRate;
             this.isChargingShot = true;
         }
@@ -423,6 +423,7 @@ class Projectile extends EngineObject {
         this.color = color;
         this.setCollision();
         this.velocity = vel;
+        this.oldVel = this.velocity;
         this.lifeTimeCap = lifeTimeCap;
         this.lifeTime = this.lifeTimeCap;
         this.particleAttributes = particleAttributes;
@@ -437,8 +438,15 @@ class Projectile extends EngineObject {
             this.destroy();
             this.lifeTime = this.lifeTimeCap;
         }
+
+        if (gamePaused) {
+            this.velocity = vec2(0, 0);
+        } else {
+            this.velocity = this.oldVel;
+        }
+        
         // console.log(`hitParticleAttributes: ${this.hitParticleAttributes}`);
-        if (this.particleAttributes && !timeStopped) {
+        if (this.particleAttributes && !timeStopped && !gamePaused) {
             new ParticleEmitter(
                 this.pos,
                 this.particleAttributes.angle,
@@ -470,7 +478,7 @@ class Projectile extends EngineObject {
     }
     collideWithObject(o) {
         const parentObject = Object.getPrototypeOf(o.constructor).name;
-        if (this.hitParticleAttributes && parentObject === "PlayerChar" && !timeStopped) {
+        if (this.hitParticleAttributes && parentObject === "PlayerChar" && !timeStopped && !gamePaused) {
             console.log("hitParticles");
             new ParticleEmitter(
                 this.pos,
@@ -627,6 +635,8 @@ class EnemyProjectile extends Projectile {
         // console.log("Firing EnemyProjectile");
         this.oldVel = this.velocity;
         this.frozen = false;
+        this.oldLifeTime = 0;
+        this.gotOldLifeTime = false;
         this.resetLifeTime = false;
         this.drawSize = drawSize ? drawSize : vec2(2);
     }
@@ -637,15 +647,15 @@ class EnemyProjectile extends Projectile {
             this.destroy();
             return 1;
         }
-        if (this.frozen) {
-            this.velocity = vec2(0, 0);
-            this.lifeTime = 999999;
-            this.resetLifeTime = true;
-        } else if (this.resetLifeTime) {
-            this.velocity = this.oldVel;
-            this.lifeTime = this.lifeTimeCap;
-            this.resetLifeTime = false;
-        }
+        // if (this.frozen || gamePaused) {
+        //     this.velocity = vec2(0, 0);
+        //     this.lifeTime = 999999;
+        //     this.resetLifeTime = true;
+        // } else if (this.resetLifeTime) {
+        //     this.velocity = this.oldVel;
+        //     this.lifeTime = this.lifeTimeCap;
+        //     this.resetLifeTime = false;
+        // }
         
         if (o.constructor.name === "KnifeProjectile") {
             if (o.wasFrozen && !timeStopped) {
@@ -678,7 +688,21 @@ class EnemyProjectile extends Projectile {
     }
     update() {
         super.update();
-        
+
+        if (this.frozen || gamePaused) {
+            this.velocity = vec2(0, 0);
+            if (!this.gotOldLifeTime) {
+                this.oldLifeTime = this.lifeTime;
+                this.gotOldLifeTime = true;
+            }
+            // console.log(this.oldLifeTime);
+            this.lifeTime = 999999;
+            this.resetLifeTime = true;
+        } else if (this.resetLifeTime) {
+            this.velocity = this.oldVel;
+            this.lifeTime = this.oldLifeTime;
+            this.resetLifeTime = false;
+        }
     }
 }
 

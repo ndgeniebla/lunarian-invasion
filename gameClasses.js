@@ -216,7 +216,6 @@ class Myon extends EngineObject {
         this.powerHandler();
         // console.log(this.orbitAngle);
         //
-        new ParticleEmitter(this.pos, 0, 0.1, 0.1, 10, 3.14, undefined, new Color(1, 1, 1, 1), new Color(1, 1, 1, 1), new Color(1, 1, 1, 0), new Color(1, 1, 1, 0), 0.3, 1, 0.5, 0.1, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
         if (this.host.wasHit === true) {
             new ParticleEmitter(this.pos, 0, 12, 0.4, 10, 3.14, undefined, new Color(1, 1, 1, 1), new Color(1, 1, 1, 1), new Color(1, 1, 1, 0), new Color(1, 1, 1, 0), 0.5, 2, 1, 0.1, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
             this.destroy();
@@ -226,7 +225,10 @@ class Myon extends EngineObject {
         this.angle = this.orbitAngle;
         // console.log(this.pos.x);
         // console.log(this.pos.y);
-        this.orbitAngle += this.orbitSpeed;
+        if (!gamePaused) {
+            this.orbitAngle += this.orbitSpeed;
+            new ParticleEmitter(this.pos, 0, 0.1, 0.1, 10, 3.14, undefined, new Color(1, 1, 1, 1), new Color(1, 1, 1, 1), new Color(1, 1, 1, 0), new Color(1, 1, 1, 0), 0.3, 1, 0.5, 0.1, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
+        }
         
         if (this.host.health <= 0) {
             this.destroy();
@@ -234,7 +236,7 @@ class Myon extends EngineObject {
     }
     collideWithObject(o) {
         const parentObject = Object.getPrototypeOf(o.constructor).name;
-        if (parentObject === "Enemy") {
+        if (parentObject === "Enemy" && !gamePaused) {
             o.health -= this.damage;
         }
         return 1;

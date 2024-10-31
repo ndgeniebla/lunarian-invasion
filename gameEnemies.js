@@ -62,11 +62,20 @@ class Enemy extends EngineObject {
     }
     update() {
         super.update();
-        if (!this.frozen) {
+        if (!this.frozen && !gamePaused) {
             this.walkCycleHandler();
         }
+
+        if (this.frozen || gamePaused) {
+            this.movespeed = 0;
+            // console.log("FREEZE!!!!");
+        } else {
+            this.movespeed = this.oldMovespeed;
+        }
+
         this.pos.x = clamp(this.pos.x, -levelSize.x/2 + this.size.x, levelSize.x/2 - this.size.x);
         this.pos.y = clamp(this.pos.y, -levelSize.y/2 + this.size.y, levelSize.y/2 - this.size.y);
+        // console.log(this.movespeed);
     }
     collideWithObject(o){
         //console.log(o.constructor.name);
@@ -75,16 +84,18 @@ class Enemy extends EngineObject {
             || o.constructor.name === "ReimuBomb"
             || o.constructor.name === "SpiritSlashProjectile"
             || parentObject === "PlayerProjectile"
-            || parentObject === "PierceProjectile") && !timeStopped) {
-            this.health -= o.damage
+            || parentObject === "PierceProjectile") 
+            && !timeStopped
+            && !gamePaused) {
+            this.health -= o.damage;
             // console.log(this.health); 
         }
         
-        if (this.frozen) {
-            this.movespeed = 0;
-        } else {
-            this.movespeed = this.oldMovespeed;
-        }
+        // if (this.frozen) {
+        //     this.movespeed = 0;
+        // } else {
+        //     this.movespeed = this.oldMovespeed;
+        // }
 
         // the 'killed' bool is to prevent the case where the enemy gets "killed" multiple times (e.g. when being hit by a PierceProjectile)
         // mainly used to fix the enemy counter, as well as multiple items dropping when it's not intended
@@ -284,7 +295,7 @@ class RailGunner extends Enemy {
             this.posSelected = true;
         }
         
-        if (this.frozen) {
+        if (this.frozen || gamePaused) {
             this.velocity = vec2(0, 0);
         } else if (!this.weapon.isChargingShot) {
             // start moving to selected position

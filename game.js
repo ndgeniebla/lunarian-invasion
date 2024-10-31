@@ -26,6 +26,12 @@ let timeStopped = false;
 let totalPoints = 0;
 let startMaxPower = false;
 
+let pauseScreen;
+let gamePaused = false;
+let pauseScreenCreated = false;
+
+let soundOn = true;
+
 let screenShake = 0;
 
 // ===== MAIN MENU VARIABLES ======
@@ -210,6 +216,7 @@ function gameUpdate()
         //but railgun lasers stop rendering if you drawGround() in gameRender() instead of gameUpdate()
         //Such a STUPID error/bug, but you gotta do what you gotta do.
         //Splitting the ground and the barrier rendering seems to have helped with the screen-tearing at least
+        pauseHandler();
     }
 
     if (gameOver && keyWasPressed("Enter")) {

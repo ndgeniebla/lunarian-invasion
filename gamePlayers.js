@@ -214,25 +214,28 @@ class PlayerChar extends EngineObject {
         this.pos.x = clamp(this.pos.x, -levelSize.x/2 + this.size.x, levelSize.x/2 - this.size.x);
         this.pos.y = clamp(this.pos.y, -levelSize.y/2 + this.size.y, levelSize.y/2 - this.size.y);
         
-        this.specialTimerHandler();
-        this.slowedHandler();
-        this.walkCycleHandler();
-        this.attackCycleHandler();
-        this.powerAuraHandler();
-        // if (this.isShieldUp === true) {
+                // if (this.isShieldUp === true) {
         //     console.log("new shield made");
         //     this.shieldUp();
         // }
         // 
 
-        this.movementHandler();
+        if (!gamePaused) {
+            this.movementHandler();
+            this.specialTimerHandler();
+            this.slowedHandler();
+            this.walkCycleHandler();
+            this.attackCycleHandler();
+            this.powerAuraHandler();
+        }
+
         this.focusModeHandler();
         if (this.health <= 0) {
             this.health = 0;
             this.destroy();
         }
 
-        if (keyWasPressed("Space")) {
+        if (keyWasPressed("Space") && !gamePaused) {
             if (!this.specialOnCooldown) {
                 this.useSpecial();
             } else {
@@ -290,7 +293,7 @@ class PlayerReimu extends PlayerChar {
        });
    }
    async blessing() {
-       if (!this.wasHit) {
+       if (!this.wasHit && !gamePaused) {
            new ParticleEmitter(this.pos, 0, 6, 0.1, 50, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(2), new Color(0.502, 1, 0, 1), new Color(0.502, 1, 0, 1), new Color(0.976, 0.941, 0.749, 0), new Color(0.976, 0.941, 0.749, 0), 0.2, 1, 0.5, 0.05, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
        }
        if (!this.wasHit && !this.regening) {
@@ -331,7 +334,7 @@ class PlayerReimu extends PlayerChar {
         return 1;
     }
    render() {
-       const currFrame = this.attacking ? 2 + (this.attackFrame | 0) : (this.walkFrame | 0);
+       const currFrame = this.attacking && !gamePaused ? 2 + (this.attackFrame | 0) : (this.walkFrame | 0);
        this.tileInfo = tile(tileTable.reimu, this.tileSize).frame(currFrame);
        drawTile(this.pos, this.drawSize, this.tileInfo, undefined, undefined, this.mirror);
    }
@@ -436,7 +439,7 @@ class PlayerYoumu extends PlayerChar {
         }
     }
     render() {
-        const currFrame = this.attacking ? 2 + (this.attackFrame | 0) : (this.walkFrame | 0);
+        const currFrame = this.attacking && !gamePaused ? 2 + (this.attackFrame | 0) : (this.walkFrame | 0);
         this.tileInfo = tile(tileTable.youmu, this.tileSize).frame(currFrame);
         drawTile(this.pos, this.drawSize, this.tileInfo, undefined, undefined, this.mirror);
     }
@@ -518,7 +521,7 @@ class PlayerSakuya extends PlayerChar {
     }
     update() {
         super.update();
-        if (this.damageBoosted) {
+        if (this.damageBoosted && !gamePaused) {
             new ParticleEmitter(this.pos, 0, 4, 0.2, 4, 0, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(0), new Color(0.329, 0.49, 0.922, 1), new Color(0.329, 0.49, 0.922, 1), new Color(0.961, 0.988, 0.988, 0.7), new Color(0.906, 0.973, 0.969, 0.7), 0.2, 1.5, 0.75, 0.15, 0, 1, 1, 0, 0.5, 0.1, 0, 0, 0, 1, 4);
         }
         for (const o of engineObjects) {
@@ -532,7 +535,7 @@ class PlayerSakuya extends PlayerChar {
         }
     }
     render() {
-        const currFrame = this.attacking ? 2 + (this.attackFrame | 0) : (this.walkFrame | 0);
+        const currFrame = this.attacking && !gamePaused ? 2 + (this.attackFrame | 0) : (this.walkFrame | 0);
         const sakuyaMode = timeStopped ? tileTable.sakuyaTimeStop : tileTable.sakuyaNormal;
         this.tileInfo = tile(sakuyaMode, this.tileSize).frame(currFrame);
         drawTile(this.pos, this.drawSize, this.tileInfo, undefined, undefined, this.mirror);

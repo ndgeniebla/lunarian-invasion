@@ -414,6 +414,17 @@ class CriticalHitScreen extends EngineObject {
     }
 }
 
+class PauseScreen extends EngineObject {
+    constructor() {
+        super(vec2(0,0), levelSize.scale(2));
+        this.color = new Color(0.2, 0.2, 0.2, 0.4);
+        this.renderOrder = 99;
+    }
+    update() {
+        super.update();
+    }
+}
+
 function playerHud() {
     const playerHealth = new Bar(vec2(mainCanvasSize.x / 2, mainCanvasSize.y - 60), 16, player.health, player.maxHealth, new Color(0, 1, 0, 1), 2);
     drawTextScreen(`${player.health}/${player.maxHealth}`, vec2(mainCanvasSize.x / 2, mainCanvasSize.y - 85), 100, new Color(255, 255, 255), 10);
@@ -440,4 +451,21 @@ function playerHud() {
     waveBar.draw();
 }
 
-
+function pauseHandler() {
+    if (keyWasPressed("Backquote")) {
+        gamePaused = !gamePaused;
+        if (gamePaused) {
+            pauseScreenCreated = true;
+            pauseScreen = new PauseScreen();
+        } else {
+            pauseScreenCreated = false;
+            pauseScreen.destroy();
+        }
+    }
+    
+    if (gamePaused) {
+        drawTextScreen(`Game Paused`, vec2(mainCanvasSize.x/2, mainCanvasSize.y - 210), 150, (new Color).setHex("#ffffff"), 10); 
+    };
+    // console.log(`gamePaused = ${gamePaused}, pauseScreenCreated = ${pauseScreenCreated}`);
+    
+}
