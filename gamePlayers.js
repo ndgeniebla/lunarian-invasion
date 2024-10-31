@@ -161,11 +161,12 @@ class PlayerChar extends EngineObject {
         return new Promise((resolve) => {
             setTimeout(() => {
                 this.specialCountingDown = false;
-                if (this.specialOnCooldown) {
+                if (this.specialOnCooldown && !gamePaused && !gameOver) {
                     this.specialTimer = clamp(this.specialTimer + 1, 0, this.cooldownDuration/1000);
-                } else {
+                    console.log(this.specialTimer);
+                } /* else {
                     this.specialTimer = clamp(this.specialTimer * 2, 0, this.cooldownDuration/1000);
-                }
+                } */
                 resolve();
             }, 1000);
         });
@@ -186,7 +187,7 @@ class PlayerChar extends EngineObject {
         new PierceProjectile(this.pos, velVec, vec2(10, 20), angle, 9999, new Color(255, 255, 0), this.bulletLifeTimeCap);
         console.log("Special ability used");
         this.specialOnCooldown = true;
-        this.specialOnCooldown = await this.specialCooldown();
+        // this.specialOnCooldown = await this.specialCooldown();
     }
     // shieldHandler() {
     //     return new Promise((resolve) => {
@@ -227,6 +228,11 @@ class PlayerChar extends EngineObject {
             this.walkCycleHandler();
             this.attackCycleHandler();
             this.powerAuraHandler();
+        }
+        
+        if ((this.specialTimer === this.cooldownDuration / 1000) && this.specialOnCooldown) {
+            this.specialOnCooldown = false;
+            console.log("Special is now ready!");
         }
 
         this.focusModeHandler();
@@ -316,7 +322,7 @@ class PlayerReimu extends PlayerChar {
        console.log("Special ability used");
        this.specialOnCooldown = true;
        console.log("Special on cooldown");
-       this.specialOnCooldown = await this.specialCooldown();
+    //    this.specialOnCooldown = await this.specialCooldown();
    }
    update() {
        super.update();
@@ -418,7 +424,7 @@ class PlayerYoumu extends PlayerChar {
         await this.spiritSlash(velVec);
         this.specialOnCooldown = true;
         this.dashing = await this.dash();
-        this.specialOnCooldown = await this.specialCooldown();
+        // this.specialOnCooldown = await this.specialCooldown();
         console.log("Special ability used");
     }
     myonCooldownTimer() {
@@ -517,7 +523,7 @@ class PlayerSakuya extends PlayerChar {
         console.log("Special ability used");
         this.specialOnCooldown = true;
         
-        this.specialOnCooldown = await this.specialCooldown();
+        // this.specialOnCooldown = await this.specialCooldown();
     }
     update() {
         super.update();

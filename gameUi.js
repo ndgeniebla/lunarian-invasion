@@ -464,7 +464,7 @@ function pauseHandler() {
     }
     
     if (gamePaused) {
-        drawTextScreen(`Game Paused`, vec2(mainCanvasSize.x/2, mainCanvasSize.y - 210), 150, (new Color).setHex("#ffffff"), 10); 
+        drawTextScreen(`Paused`, vec2(mainCanvasSize.x/2, mainCanvasSize.y - 220), 180, (new Color).setHex("#ffffff"), 10); 
     };
     // console.log(`gamePaused = ${gamePaused}, pauseScreenCreated = ${pauseScreenCreated}`);
     

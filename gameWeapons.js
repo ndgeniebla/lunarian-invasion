@@ -433,7 +433,10 @@ class Projectile extends EngineObject {
     }
     update() {
         super.update();
-        this.lifeTime -= 1;
+        if (!gamePaused) {
+            this.lifeTime -= 1;
+        }
+        
         if (this.lifeTime <= 0) {
             this.destroy();
             this.lifeTime = this.lifeTimeCap;
@@ -716,6 +719,8 @@ class ReimuBomb extends EngineObject {
         this.color = new Color(255, 0, 0, 0.5);
         this.setCollision();
         this.velocity = vel;
+        this.oldVel = 0;
+        this.gotOldVel = false;
         this.lifeTimeCap = 300;
         this.lifeTime = this.lifeTimeCap;
         this.rotation = 0;
@@ -724,9 +729,23 @@ class ReimuBomb extends EngineObject {
     }
     update() {
         super.update();
-        this.rotation += 0.1;
-        this.angle = this.rotation;
-        this.lifeTime -= 1;
+        if (!gamePaused) {
+            this.rotation += 0.1;
+            this.angle = this.rotation;
+            this.lifeTime -= 1;
+        }
+        
+        if (gamePaused) {
+            if (!this.gotOldVel) {
+                this.oldVel = this.velocity;
+                this.gotOldVel = true;
+            }
+            this.velocity = vec2(0);
+        } else if (this.gotOldVel) {
+            this.velocity = this.oldVel;
+            this.gotOldVel = false;
+        }
+        
         if (this.lifeTime <= 0) {
             this.destroy();
             this.lifeTime = this.lifeTimeCap;
