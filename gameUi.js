@@ -452,7 +452,7 @@ function playerHud() {
 }
 
 function pauseHandler() {
-    if (keyWasPressed("Backquote")) {
+    if (keyWasPressed("Backquote") && !gameOver) {
         gamePaused = !gamePaused;
         if (gamePaused) {
             pauseScreenCreated = true;

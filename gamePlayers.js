@@ -145,18 +145,18 @@ class PlayerChar extends EngineObject {
             await this.slowOff();
         }
     }
-    specialCooldown() {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (!gameOver) {
-                    console.log("Special is now ready!");
-                    resolve(false);
-                } else {
-                    resolve(true);
-                }
-            }, this.cooldownDuration);
-        });
-    }
+    // specialCooldown() {
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             if (!gameOver) {
+    //                 console.log("Special is now ready!");
+    //                 resolve(false);
+    //             } else {
+    //                 resolve(true);
+    //             }
+    //         }, this.cooldownDuration);
+    //     });
+    // }
     specialTimerCount() {
         return new Promise((resolve) => {
             setTimeout(() => {
