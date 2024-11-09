@@ -89,6 +89,7 @@ class HomingAmulet extends PlayerWeapon {
         const shotVec = vec2(velXY[0]*this.projectileSpeed, velXY[1]*this.projectileSpeed);
 
         let rotateInterval = rotateVal;
+        reimuShootSound.play();
         for (let i = 0; i < this.shotCount; i++) {
             const rotatedVec = shotVec.rotate(rotateInterval);
             new HomingProjectile(this.pos, rotatedVec, vec2(1, 1), rotatedVec.angle(), this.damage, new Color(255, 255, 0), this.bulletLifeTimeCap);
@@ -171,6 +172,7 @@ class Sword extends PlayerWeapon {
         const shotVec = vec2(velXY[0]*currProjSpeed, velXY[1]*currProjSpeed);
     
         let rotateVal = rotateStart;
+        youmuShootSound.play();
         for (let i = 0; i < currShotCount; i++) {
             const rotateShotVec = shotVec.rotate(rotateVal);
             new PierceProjectile(cameraPos, rotateShotVec, vec2(2, 0.5), rotateShotVec.angle(), this.damage, (new Color).setHex("#dadada"), currBulletLifeTimeCap, this.projectileTileInfo, this.projectileDrawSize, this.bulletParticleAttributes);
@@ -218,6 +220,7 @@ class ThrowingKnives extends PlayerWeapon {
                 setTimeout(() => {
                     const randomDeviation = rand(0, this.maxDeviation);
                     const spreadVel = vel.rotate(randomDeviation);
+                    sakuyaShootSound.play();
                     new KnifeProjectile(this.pos, spreadVel, vec2(1,2), spreadVel.angle(), this.damage, new Color(0, 255, 0), this.bulletLifeTimeCap);
                 }, this.throwDelay * (i + 1));
             }
@@ -230,6 +233,7 @@ class ThrowingKnives extends PlayerWeapon {
             const velVec = vec2(velXY[0]*this.projectileSpeed, velXY[1]*this.projectileSpeed);
             //at least one projectile has no deviation
             new KnifeProjectile(this.pos, velVec, vec2(1,2), velVec.angle(), this.damage, new Color(0, 255, 0), this.bulletLifeTimeCap);
+            sakuyaShootSound.play();
             this.throwing = true;
             this.throwing = await this.burstShot(velVec);
         }
@@ -384,6 +388,7 @@ class EnemyRailgun extends EnemyWeapon {
             this.fireTimeBuffer = 0;
         } else if (this.fireTimeBuffer >= this.fireTimeCap) {
             this.fire(this.markedPos, this, this.projectileSpeed);
+            railgunShootSound.play();
             // console.log(`Shot fired at ${this.markedPos}`);
             this.targetMarked = false;
 
@@ -672,6 +677,7 @@ class EnemyProjectile extends Projectile {
                 if (o.constructor.name === "PlayerYoumu" && !o.myonRespawning) {
                     screenShake = 0;
                 } else {
+                    railgunHitSound.play();
                     screenShake = 20;
                     new CriticalHitScreen();
                 }
@@ -726,16 +732,23 @@ class ReimuBomb extends EngineObject {
         this.rotation = 0;
         this.mass = 0;
         this.renderOrder = 1;
+        this.soundPlayed = false;
     }
     update() {
         super.update();
         if (!gamePaused) {
+            if (!this.soundPlayed) {
+                reimuBombSound.play(undefined, undefined, undefined, undefined, true);
+                this.soundPlayed = true;
+            }
             this.rotation += 0.1;
             this.angle = this.rotation;
             this.lifeTime -= 1;
         }
         
         if (gamePaused) {
+            reimuBombSound.stop();
+            this.soundPlayed = false;
             if (!this.gotOldVel) {
                 this.oldVel = this.velocity;
                 this.gotOldVel = true;
@@ -747,6 +760,7 @@ class ReimuBomb extends EngineObject {
         }
         
         if (this.lifeTime <= 0) {
+            reimuBombSound.stop();
             this.destroy();
             this.lifeTime = this.lifeTimeCap;
         }

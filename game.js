@@ -11,6 +11,8 @@ const defaultEntitySize = 12 * 2; // in pixels
 const defaultItemProjSize = 8 * 2;
 const defaultTileSize = 12 * 2;
 
+soundEnable = true;
+
 let playerHealth = 0;
 let player;
 
@@ -79,7 +81,45 @@ let menuButtons = [ endlessButton,
 let characterInfo = [];
 
 // ==================================
+// SOUNDS
+// const enemyHitSound = new Sound([,,187,.02,.04,.03,,1.1,,,,,.04,,,,,.79,.02,,-1444]); // Blip 573
+const healthUpSound = new Sound([.5,,106,.08,.3,.18,,2.6,,-146,491,.08,.08,,,,,.69,.25,,-1424]); // Powerup 296
+const maxPowerUpSound = new Sound([.5,,609,,.14,.2,1,.5,-7,,396,.05,.09,,,,,.7,.22,,-608]); // Powerup 221
 
+const enemyDeathSound = new Sound([.8,.25,,.02,,.05,1,,.4,,,,.04,,,,,0,.01,,-1444]); // Blip 573 
+const railgunShootSound = new Sound([.2,,82,,.14,.15,3,1.3,-20,2,,,,,,.1,.17,.83,.19,,1e3]); // Shoot 600
+const railgunHitSound = new Sound([1,,45,,.1,.64,4,1.8,-5,-1,,,.14,.1,,.4,,.34,.23,.05,265]); // Explosion 193
+const slowedSound = new Sound([1.1,,417,.01,.07,.06,1,1.8,,,,,.03,.4,45,,,.45,.04,.42]); // Hit 1355
+const swarmerShootSound = new Sound([.05,,261.6256,.02,.03,.03,1,,,7,,,,,173,,,0,.01]); // Blip 1786
+const gunnerShootSound = new Sound([.03,,195.9977,.02,.03,.03,,2.5,,7,,,,,173,,,.52,.01]); // Blip 1786
+const shotGunnerSound = new Sound([.4,0,174.6141,.05,,.03,1,.6,,9,,,.02,.2,8.8,,,.97,.01]); // Random 1780 
+const boltShootSound = new Sound([,,324,.03,.05,.09,,1.9,-3,-7,,,.04,,,,,.57,.02,,-1497]); // Pickup 1885
+
+const blessingSound = new Sound([2,,398,.03,.24,.09,1,4,,,81,.06,.02,,,,.18,.54,.11]); // Powerup 235
+const blessingBreakSound = new Sound([1.5,,284,.01,.05,.09,2,3.8,5,,,,,.5,,.1,,.78,.1,.04,-2489]); // Hit 369
+
+const youmuShootSound = new Sound([,,173,.03,.01,.02,1,.9,,,50,.14,.01,1,2,,,-0.1,.05,,1]); // Hit 894 - Mutation 4 
+const spiritSlashSound = new Sound([,,44,.03,,.62,3,1.2,7,-8,,,,.2,,.4,,.4,.13,.33,-3496]); // Explosion 143
+const spiritFinalSlashSound = new Sound([,,364,.2,.21,.05,3,.8,-5.2,-18,,,,,32,.1,.35,.5,.09]); // Shoot 1407
+const myonBlockSound = new Sound([2.1,,327,.02,,.008,2,1.8,-4,,,,,.8,,.1,.17,.47,.06,,-2231]); // Hit 290
+const myonRespawnSound = new Sound([2.0,,278,.02,.05,.11,,2.5,10,,,,,,,,,.56,.05,,897]); // Pickup 342
+// const reimuShootSound = new Sound([1.9,.03,349.2282,,.03,.07,,2,,-10,,,.02,,,,,0,.12]); // Pickup 339
+//
+const reimuShootSound = new Sound([0.3,,510,,.01,.11,,1.4,2.9,-91,-50,,.01,,,,,.54,,,-978]); // Random 155 - Mutation 1 
+const reimuBombSound = new Sound([.2,0,540,.05,.3,.07,,3.2,,47,,,.02,,6.7,,,.9,.18,,-525]); // Powerup 1797
+// const youmuShootSound = new Sound([.7,0,285,.01,,.09,,,40.6,,-250,.02,,1.1,2,,,.66,.02,.2,-1166]); // Jump 495
+
+const sakuyaShootSound = new Sound([.7,0,73.41619,,,.09,,,40.6,,-650,,,1.1,2,,,.5,,.2,-1166]); // Jump 495
+const sakuyaDamageBoostSound = new Sound([1.1,0,197,.09,.14,.19,,1.2,,,41,.08,.06,,,,,.6,.12,.07]); // Powerup 1046
+const timeStopSound = new Sound([1.0,0,130.8128,.05,.03,.3,1,.1,,,,,,.1,,,.18,.93,.11,,-1495]); // Music 1047
+const timeStopTick = new Sound([,,523.2511,,,.03,,,,,,-0.02,,,,,,1.5]); // Music 1108
+// const timeStopEnd = new Sound([2,0,130.8128,.13,.66,.35,,1.6,,,,,,.1,,,.14,.32,.02,,-1428]); // Music 1123
+const timeStopEnd = new Sound([,,652,.05,.19,.47,,2.4,,174,-107,.09,.05,,,,,.54,.18,.43]); // Powerup 1131
+
+const pickupSound = new Sound([0.6,,523.2511,,,.01]); // Random 1359
+const pauseSound = new Sound([1.1,0,43,.01,.04,.03,,4.8,,,,,,,,,,.72,.02]); // Blip 1393
+const specialNotReadySound = new Sound([1.2,0,10,.01,.04,.05,1,.5,-81,5,,.01,-0.01,,,,.02,.42,,,-1338]); // Blip 1503 - Mutation 1
+const deathSound = new SoundWave("assets/pichuun.wav");
 
 const tileTable = {
     //tiles.png (textureIndex = 0)
@@ -219,6 +259,7 @@ function gameUpdate()
         pauseHandler();
     }
 
+    // Back to menu handler
     if (gameOver && keyWasPressed("Enter")) {
         console.log("hello");
         gameStarted = false; 
@@ -233,6 +274,8 @@ function gameUpdate()
         startGameButton.selected = false;
         makeMenuScreen(menuStates.mainScreen);
         cursor = new Cursor();
+        player = undefined; // prevents enemies in the next game from targeting the old dead player's position
+        console.log(player);
     }
 }
 

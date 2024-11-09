@@ -457,6 +457,7 @@ function pauseHandler() {
         if (gamePaused) {
             pauseScreenCreated = true;
             pauseScreen = new PauseScreen();
+            pauseSound.play();
         } else {
             pauseScreenCreated = false;
             pauseScreen.destroy();

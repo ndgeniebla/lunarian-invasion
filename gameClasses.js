@@ -131,11 +131,13 @@ class PowerUp extends Item {
                 // o.power = clamp(o.power + 2, 0, o.maxPower);
                 if (o.power === o.maxPower) { //only display text when initially hitting max power
                     new StatusText(o.pos, o, "MAX POWER", 4, (new Color).setHex("#ff5900"));
+                    maxPowerUpSound.play();
                 } else {
                     new StatusText(o.pos, o, "POWER UP", 3, (new Color).setHex("#ff5900"));
                 }
             }
             // o.power = clamp(o.power + 2, 0, o.maxPower);
+            pickupSound.play();
             this.destroy();
             return 1;
         }
@@ -155,6 +157,7 @@ class HealthUp extends Item {
             if (o.health === o.maxHealth) {
                 totalPoints += 100;
                 new StatusText(o.pos, o, "+100", 3, (new Color).setHex("#ffd52b"));
+                pickupSound.play();
             } else {
                 if (o.constructor.name === "PlayerReimu") {
                     o.health = clamp(o.health + 10, 0, o.maxHealth);
@@ -163,6 +166,7 @@ class HealthUp extends Item {
                     o.health = clamp(o.health + 20, 0, o.maxHealth);
                     new StatusText(o.pos, o, "+20 HP", 3.5, (new Color).setHex("#1aff00"));
                 }
+                healthUpSound.play();
             }
             this.destroy();
             return 1;
@@ -218,6 +222,7 @@ class Myon extends EngineObject {
         //
         if (this.host.wasHit === true) {
             new ParticleEmitter(this.pos, 0, 12, 0.4, 10, 3.14, undefined, new Color(1, 1, 1, 1), new Color(1, 1, 1, 1), new Color(1, 1, 1, 0), new Color(1, 1, 1, 0), 0.5, 2, 1, 0.1, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
+            myonBlockSound.play();
             this.destroy();
         }
         this.pos.x = this.host.pos.x + this.dist * Math.cos(this.orbitAngle);

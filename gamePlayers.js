@@ -142,6 +142,7 @@ class PlayerChar extends EngineObject {
             this.movespeed = 0.5;
             this.walkCycleReset = 20;
             new StatusText(this.pos, this, "SLOWED", 4, new Color(1, 1, 0));
+            slowedSound.play();
             await this.slowOff();
         }
     }
@@ -164,6 +165,9 @@ class PlayerChar extends EngineObject {
                 if (this.specialOnCooldown && !gamePaused && !gameOver) {
                     this.specialTimer = clamp(this.specialTimer + 1, 0, this.cooldownDuration/1000);
                     console.log(this.specialTimer);
+                    if (timeStopped) {
+                        timeStopTick.play();
+                    }
                 } /* else {
                     this.specialTimer = clamp(this.specialTimer * 2, 0, this.cooldownDuration/1000);
                 } */
@@ -238,6 +242,7 @@ class PlayerChar extends EngineObject {
         this.focusModeHandler();
         if (this.health <= 0) {
             this.health = 0;
+            deathSound.play();
             this.destroy();
         }
 
@@ -246,6 +251,7 @@ class PlayerChar extends EngineObject {
                 this.useSpecial();
             } else {
                 console.log("Special on cooldown!");
+                specialNotReadySound.play();
                 // new StatusText(this.pos, this, "Special Not Ready", 3.5, (new Color).setHex("#fc44fc"));
             }
         }
@@ -291,6 +297,7 @@ class PlayerReimu extends PlayerChar {
             //    console.log("blessing recovered");
                if (!gameOver && gameStarted) {
                    new StatusText(this.pos, this, "HEALTH REGEN", 3.5, (new Color).setHex("#9cff19"));
+                   blessingSound.play();
                }
                this.wasHit = false;
                this.recoveringBlessing = false;
@@ -308,6 +315,7 @@ class PlayerReimu extends PlayerChar {
        } else if (this.wasHit && !this.recoveringBlessing) {
            this.recoveringBlessing = true;
            new ParticleEmitter(this.pos, 0, 10, 0.2, 50, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(2), new Color(0.502, 1, 0, 1), new Color(0.502, 1, 0, 1), new Color(0.976, 0.941, 0.749, 0), new Color(0.976, 0.941, 0.749, 0), 0.3, 1, 4, 0.05, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
+           blessingBreakSound.play();
            console.log("blessing broken, on cooldown...");
            await this.blessingRecover();
        }
@@ -398,6 +406,7 @@ class PlayerYoumu extends PlayerChar {
                    new SpiritSlashProjectile(this.pos, rotateVel, vec2(3,1), rotateVel.angle(), this.ssDamage, (new Color).setHex("#dadada"), bulletLifeTimeCap);
                    rotateVal += 2*PI/(finalSlashCount * 8.37); //~0.025
                }
+               spiritFinalSlashSound.play();
                resolve(false);
            }, this.dashDuration);
        }) 
@@ -421,6 +430,7 @@ class PlayerYoumu extends PlayerChar {
         // const projectileSpeed = 2;
         const vel = vec2(0, -1);
         const velVec = vel.scale(projectileSpeed);
+        spiritSlashSound.play();
         await this.spiritSlash(velVec);
         this.specialOnCooldown = true;
         this.dashing = await this.dash();
@@ -432,6 +442,7 @@ class PlayerYoumu extends PlayerChar {
             setTimeout(() => {
                 this.myon = new Myon(this.pos, this);
                 this.wasHit = false;
+                myonRespawnSound.play();
                 console.log("myon respawned");
                 resolve(false)
             }, this.myonRespawnTime);
@@ -501,6 +512,7 @@ class PlayerSakuya extends PlayerChar {
             new StatusText(this.pos, this, "DAMAGE UP", 3.5, (new Color).setHex("#abd1ff"));
             console.log("damage boosted");
             this.damageBoosted = true;
+            sakuyaDamageBoostSound.play();
             await this.damageBoostTimer();
         }
     }
@@ -513,12 +525,14 @@ class PlayerSakuya extends PlayerChar {
                 timeStopped = false;
                 this.freeze(false);
                 bubble.durationDone = true;
+                timeStopEnd.play();
             }, this.timeStopDuration);
             resolve(true);
         });
     }
     async useSpecial() {
         this.specialTimer = 0;
+        timeStopSound.play();
         await this.stopTime();
         console.log("Special ability used");
         this.specialOnCooldown = true;

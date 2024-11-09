@@ -25,6 +25,8 @@ function normalFire(target, host, damage, projectileSpeed, bulletLifeTimeCap, pr
     const angle = velVec.angle();
     const colour = projectileColour ? projectileColour : new Color(255, 255 ,0);
     // console.log(tileInfo);
+    if (bulletType === "swarmer") swarmerShootSound.play();
+    else if(bulletType === "gunner") gunnerShootSound.play();
     new EnemyProjectile(host.pos, velVec, vec2(1,1), angle, damage, colour, bulletLifeTimeCap, tileInfo, undefined, undefined, undefined, bulletType);
 }
 
@@ -41,6 +43,7 @@ function shotgunFire(target, host, damage, projectileSpeed, bulletLifeTimeCap, p
         new EnemyProjectile(host.pos, shotVec.rotate(rotateVal), vec2(1,1), angle, damage, (new Color).setHex("#ff0afb"), bulletLifeTimeCap, tileInfo, undefined, undefined, undefined, bulletType);
         rotateVal += 0.1;
     }
+    shotGunnerSound.play();
 }
 
 function radialFire(target, host, damage, projectileSpeed, bulletLifeTimeCap, projectileColour, tileInfo, drawSize, bulletType) {
@@ -53,6 +56,7 @@ function radialFire(target, host, damage, projectileSpeed, bulletLifeTimeCap, pr
         new EnemyProjectile(host.pos, rotateVec, vec2(2,3), rotateVec.angle(), damage, (new Color).setHex("#ff0afb"), bulletLifeTimeCap, tileInfo, drawSize, undefined, undefined, bulletType);
         rotateVal += 2*PI/shotCount;
     }
+    boltShootSound.play();
 }
 
 function toMilliseconds(seconds) {

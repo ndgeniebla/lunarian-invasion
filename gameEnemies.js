@@ -114,6 +114,7 @@ class Enemy extends EngineObject {
             }
             totalEnemies--;
             this.dropItem();
+            enemyDeathSound.play();
             this.destroy();
             totalPoints += this.points;
             this.killed = true;
@@ -136,7 +137,7 @@ class Swarmer extends Enemy {
         const bulletLifeTimeCap = 10;
 
         const projectileTileInfo = tile(tileTable.enemyProjectiles, defaultItemProjSize, 1).frame(0);
-        this.weapon = new EnemyGun(this.pos, this, damage, projectileSpeed, fireRate, target, normalFire, bulletLifeTimeCap, this.color, projectileTileInfo);
+        this.weapon = new EnemyGun(this.pos, this, damage, projectileSpeed, fireRate, target, normalFire, bulletLifeTimeCap, this.color, projectileTileInfo, undefined, "swarmer");
         this.points = 100;
 
         this.walkCycleReset = 10;
@@ -176,7 +177,7 @@ class Gunner extends Enemy {
 
         //projectile rendering
         const projectileTileInfo = tile(tileTable.enemyProjectiles, defaultItemProjSize, 1).frame(1);
-        this.weapon = new EnemyGun(this.pos, this, damage, projectileSpeed, fireRate, target, normalFire, bulletLifeTimeCap, undefined, projectileTileInfo);
+        this.weapon = new EnemyGun(this.pos, this, damage, projectileSpeed, fireRate, target, normalFire, bulletLifeTimeCap, undefined, projectileTileInfo, undefined, "gunner");
 
         this.color = new Color(255, 255, 0);
         this.maxHealth = 16;
