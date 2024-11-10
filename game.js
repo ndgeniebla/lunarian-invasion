@@ -303,7 +303,9 @@ function gameUpdate()
         makeMenuScreen(menuStates.mainScreen);
         cursor = new Cursor();
         player = undefined; // prevents enemies in the next game from targeting the old dead player's position
-        bgMusicStartStop(false);
+        bgReimu.stop();
+        bgSakuya.stop();
+        bgYoumu.stop();
         menuMusic.play(null, 1, null, null, true);
         menuMusicStarted = true;
         console.log(player);
