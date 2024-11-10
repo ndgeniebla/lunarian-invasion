@@ -243,6 +243,7 @@ class PlayerChar extends EngineObject {
         if (this.health <= 0) {
             this.health = 0;
             deathSound.play();
+            new ParticleEmitter(this.pos, 0, 2, 0.2, 20, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(3), new Color(1, 0.043, 0.067, 1), new Color(1, 0.043, 0.067, 1), new Color(1, 0.043, 0.067, 0), new Color(1, 0.043, 0.067, 0), 1, 4, 4, 0.3, 0, 1, 0, 0, 0, 0.01, 0.2, 0, 0, 1);
             this.destroy();
         }
 
@@ -295,9 +296,9 @@ class PlayerReimu extends PlayerChar {
        return new Promise((resolve) => {
            setTimeout(() => {
             //    console.log("blessing recovered");
-               if (!gameOver && gameStarted) {
+               if (!gameOver && gameStarted && !gamePaused) {
                    new StatusText(this.pos, this, "HEALTH REGEN", 3.5, (new Color).setHex("#9cff19"));
-                   blessingSound.play();
+                   if (audioContext.state === "running") blessingSound.play();
                }
                this.wasHit = false;
                this.recoveringBlessing = false;
@@ -440,11 +441,13 @@ class PlayerYoumu extends PlayerChar {
     myonCooldownTimer() {
         return new Promise((resolve) => {
             setTimeout(() => {
-                this.myon = new Myon(this.pos, this);
-                this.wasHit = false;
-                myonRespawnSound.play();
-                console.log("myon respawned");
-                resolve(false)
+                if (gameStarted) {
+                    this.myon = new Myon(this.pos, this);
+                    this.wasHit = false;
+                    if (audioContext.state === "running") myonRespawnSound.play();
+                    console.log("myon respawned");
+                }
+                resolve(false);
             }, this.myonRespawnTime);
         });
     }

@@ -1,5 +1,7 @@
 
 'use strict';
+
+
 const levelSize = vec2(200,200);
 objectMaxSpeed = 4;
 objectDefaultFriction = 1;
@@ -32,7 +34,7 @@ let pauseScreen;
 let gamePaused = false;
 let pauseScreenCreated = false;
 
-let soundOn = true;
+let menuMusicStarted = false;
 
 let screenShake = 0;
 
@@ -93,7 +95,7 @@ const slowedSound = new Sound([1.1,,417,.01,.07,.06,1,1.8,,,,,.03,.4,45,,,.45,.0
 const swarmerShootSound = new Sound([.05,,261.6256,.02,.03,.03,1,,,7,,,,,173,,,0,.01]); // Blip 1786
 const gunnerShootSound = new Sound([.03,,195.9977,.02,.03,.03,,2.5,,7,,,,,173,,,.52,.01]); // Blip 1786
 const shotGunnerSound = new Sound([.4,0,174.6141,.05,,.03,1,.6,,9,,,.02,.2,8.8,,,.97,.01]); // Random 1780 
-const boltShootSound = new Sound([,,324,.03,.05,.09,,1.9,-3,-7,,,.04,,,,,.57,.02,,-1497]); // Pickup 1885
+const boltShootSound = new Sound([0.05,,324,.03,.05,.09,,1.9,-3,-7,,,.04,,,,,.57,.02,,-1497]); // Pickup 1885
 
 const blessingSound = new Sound([2,,398,.03,.24,.09,1,4,,,81,.06,.02,,,,.18,.54,.11]); // Powerup 235
 const blessingBreakSound = new Sound([1.5,,284,.01,.05,.09,2,3.8,5,,,,,.5,,.1,,.78,.1,.04,-2489]); // Hit 369
@@ -120,6 +122,23 @@ const pickupSound = new Sound([0.6,,523.2511,,,.01]); // Random 1359
 const pauseSound = new Sound([1.1,0,43,.01,.04,.03,,4.8,,,,,,,,,,.72,.02]); // Blip 1393
 const specialNotReadySound = new Sound([1.2,0,10,.01,.04,.05,1,.5,-81,5,,.01,-0.01,,,,.02,.42,,,-1338]); // Blip 1503 - Mutation 1
 const deathSound = new SoundWave("assets/pichuun.wav");
+const menuMusic = new SoundWave("assets/menu.mp3");
+
+// LittleJS has an undocumented(?) issue where if the audio files are too big, it's possible for the player to start the game before the SoundWave file has properly loaded.
+// This means that no music will play if the player immediately starts the game before any of the audio files have loaded.
+const bgReimu = new SoundWave("assets/reimu-theme.mp3");
+const bgSakuya = new SoundWave("assets/sakuya-theme.mp3");
+const bgYoumu = new SoundWave("assets/youmu-theme.mp3");
+
+document.addEventListener("click", (e) => {
+    if (!gameStarted) audioContext.resume().then(() => {
+        // console.log("hello")
+        if (!menuMusic.isLoading() && !menuMusicStarted) {
+            menuMusic.play(null, 1, null, null, true);
+            menuMusicStarted = true;
+        }
+    });
+});
 
 const tileTable = {
     //tiles.png (textureIndex = 0)
@@ -160,15 +179,20 @@ function createPlayer() {
     switch (characterSelected) {
         case characters.reimu:
             player = new PlayerReimu;
+            bgReimu.play(null, 1, null, null, true);
             break;
         case characters.sakuya:
             player = new PlayerSakuya;
+            bgSakuya.play(null, 1, null, null, true);
             break;
         case characters.youmu:
             player = new PlayerYoumu;
+            bgYoumu.play(null, 1, null, null, true);
             break;
     }
 }
+
+
 function prepGame() {
     createPlayer();
     if (startMaxPower) {
@@ -179,7 +203,10 @@ function prepGame() {
     new Wall(vec2(levelSize.x/2, 0), vec2(1, levelSize.y)); // right wall
     new Wall(vec2(0, levelSize.y/2), vec2(levelSize.x, 1)); // top wall
     new Wall(vec2(0, -levelSize.y/2), vec2(levelSize.x, 1)); // bottom wall
-   
+
+    menuMusic.stop();
+    menuMusicStarted = false;
+    
     gameStarted = true;
 }
 
@@ -207,7 +234,8 @@ function gameInit()
     canvasFixedSize = vec2(2100, 1920);
     cameraPos = vec2(0, 0);
     cameraScale = 16 * 2;
-
+    // document.getElementById('canvas').addEventListener("click", (event) => audioContext.resume());
+    // menuMusic.play(null, 0.5, null, null, true);
     
     // draw main menu
     drawRect(vec2(0, 0), levelSize.scale(2), new Color(0.2, 0, 0.2, 1));
@@ -275,6 +303,9 @@ function gameUpdate()
         makeMenuScreen(menuStates.mainScreen);
         cursor = new Cursor();
         player = undefined; // prevents enemies in the next game from targeting the old dead player's position
+        bgMusicStartStop(false);
+        menuMusic.play(null, 1, null, null, true);
+        menuMusicStarted = true;
         console.log(player);
     }
 }

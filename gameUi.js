@@ -458,9 +458,11 @@ function pauseHandler() {
             pauseScreenCreated = true;
             pauseScreen = new PauseScreen();
             pauseSound.play();
+            bgMusicStartStop(false);
         } else {
             pauseScreenCreated = false;
             pauseScreen.destroy();
+            bgMusicStartStop(true);
         }
     }
     
@@ -469,4 +471,9 @@ function pauseHandler() {
     };
     // console.log(`gamePaused = ${gamePaused}, pauseScreenCreated = ${pauseScreenCreated}`);
     
+}
+
+function bgMusicStartStop(start) {
+    if (start) audioContext.resume();
+    else audioContext.suspend();
 }
