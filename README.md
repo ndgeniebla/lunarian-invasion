@@ -1,6 +1,8 @@
 ![](https://github.com/ndgeniebla/lunarian-invasion/blob/master/assets/logo-readme.png?raw=true)
 
-This is a personal Touhou fan game project made using JavaScript and the [LittleJS Game Engine](https://github.com/KilledByAPixel/LittleJS).
+This is a personal Touhou fan game project made using JavaScript and the LittleJS Game Engine.
+
+[**Play now in your browser!**](https://ndgeniebla.github.io/lunarian-invasion/)
 
 ## Objective
 Survive as many waves as possible and get the highest score!
@@ -12,7 +14,7 @@ Survive as many waves as possible and get the highest score!
 
 **Use Special Ability**: Spacebar
 
-**Slow Movement/Focus mode**: Hold Left Shift
+**Slow Movement/Focus mode**: Left Shift
 
 **Pause**: ~ (tilde key)
 
@@ -24,7 +26,7 @@ Survive as many waves as possible and get the highest score!
 ## Credits
 Touhou Project is the property of Team Shanghai Alice. I've adhered to the [Guidelines for Touhou Project Fan Creators](https://touhou-project.news/guidelines_en/) to the best of my ability.
 
-[LittleJS](https://github.com/KilledByAPixel/LittleJS) is made by [Frank Force](https://github.com/KilledByAPixel).
+[LittleJS Game Engine](https://github.com/KilledByAPixel/LittleJS) is made by [Frank Force](https://github.com/KilledByAPixel).
 
 Music Credit (MIDI creators):
 - [Menu Theme](https://www.youtube.com/watch?v=Bt-FrLeWwZM)
