@@ -343,6 +343,10 @@ function gameUpdate()
         bgSakuya.stop();
         bgYoumu.stop();
         menuMusic.play(null, 1, null, null, true);
+        let highestTimeoutId = setTimeout(";");
+        for (let i = 0 ; i < highestTimeoutId ; i++) { //forcefully clear all timeouts so enemies don't spawn into next round
+            clearTimeout(i); 
+        }
         menuMusicStarted = soundEnable ? true : false;
         userClickStartCount = 0;
         // console.log(player);
