@@ -348,6 +348,7 @@ function gameUpdate()
             clearTimeout(i); 
         }
         menuMusicStarted = soundEnable ? true : false;
+        startMaxPower = false;
         userClickStartCount = 0;
         // console.log(player);
     }
