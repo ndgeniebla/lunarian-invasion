@@ -243,6 +243,7 @@ class PlayerChar extends EngineObject {
         if (this.health <= 0) {
             this.health = 0;
             deathSound.play();
+            deathSoundExtra.play();
             new ParticleEmitter(this.pos, 0, 2, 0.2, 80, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(3), new Color(1, 0.043, 0.067, 1), new Color(1, 0.043, 0.067, 1), new Color(1, 0.043, 0.067, 0), new Color(1, 0.043, 0.067, 0), 1, 4, 4, 0.3, 0, 1, 0, 0, 0, 0.01, 0.2, 0, 0, 1);
             this.destroy();
         }

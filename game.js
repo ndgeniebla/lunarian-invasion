@@ -124,7 +124,8 @@ const buttonClickSound = new Sound([0.2,0,9,.01,.02,.03,,2.6,16,,,,,.1,,,,.97,.0
 const pickupSound = new Sound([0.6,,523.2511,,,.01]); // Random 1359
 const pauseSound = new Sound([1.1,0,43,.01,.04,.03,,4.8,,,,,,,,,,.72,.02]); // Blip 1393
 const specialNotReadySound = new Sound([1.2,0,10,.01,.04,.05,1,.5,-81,5,,.01,-0.01,,,,.02,.42,,,-1338]); // Blip 1503 - Mutation 1
-const deathSound = new SoundWave("assets/pichuun.wav");
+const deathSound = new Sound([1.9,,563,.42,.02,.4,1,.3,,,87,.27,,,.1,,.37,.6,.08]); // Random 1768 
+const deathSoundExtra = new Sound([,,58,.04,.3,.57,2,2.1,3,6,,,,1.2,,.2,,0,.27]); // Explosion 2011
 const menuMusic = new SoundWave("assets/menu.mp3");
 
 // LittleJS has an undocumented(?) issue where if the audio files are too big, it's possible for the player to start the game before the SoundWave file has properly loaded.
