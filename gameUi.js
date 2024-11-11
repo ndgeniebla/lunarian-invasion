@@ -17,7 +17,7 @@ class Bar {
 
 
 class Button extends EngineObject {
-    constructor(pos, size, text, fontSize) {
+    constructor(pos, size, text, fontSize, buttonType) {
         super(pos, size);
         this.selected = false;
         this.text = text ? text : "";
@@ -25,11 +25,18 @@ class Button extends EngineObject {
         this.renderOrder = 4;
         this.borderChild;
         this.fontSize = fontSize ? fontSize : 8;
+        this.buttonType = buttonType;
     }
     render() {
         const yPadding = this.fontSize / 4;
-        drawRect(this.pos, this.size, new Color(0.5, 0.5, 0.5));
-        drawText(this.text, vec2(this.pos.x, this.pos.y + yPadding), this.fontSize, new Color(1, 1, 1), 0.4);
+        if (this.buttonType === "hasBorder") {
+            const xMultiplier = this.size.x / this.size.y >= 1 ? 1.03 : 1.06;
+            const yMultiplier = this.size.x / this.size.y >= 1 ? 1.08 : 1.04;
+            drawRect(this.pos, vec2(this.size.x * xMultiplier, this.size.y * yMultiplier), (new Color).setHex("#f73c96"));
+        }
+
+        drawRect(this.pos, this.size, (new Color).setHex("#170118"));
+        drawText(this.text, vec2(this.pos.x, this.pos.y + yPadding), this.fontSize, (new Color).setHex("#ffffff"), 0.4);
         this.velocity = vec2(0, 0);
     }
     collideWithObject(o) {
@@ -40,8 +47,8 @@ class Button extends EngineObject {
     }
     selectBorder() {
         const xMultiplier = this.size.x / this.size.y >= 1 ? 1.04 : 1.06;
-        const yMultiplier = this.size.x / this.size.y >= 1 ? 1.06 : 1.04;
-        drawRect(this.pos, vec2(this.size.x * xMultiplier, this.size.y * yMultiplier), new Color(1, 1, 1));
+        const yMultiplier = this.size.x / this.size.y >= 1 ? 1.10 : 1.04;
+        drawRect(this.pos, vec2(this.size.x * xMultiplier, this.size.y * yMultiplier), (new Color).setHex("#f73c96"));
     }
     select() {
         engineObjects.forEach((obj) => {
@@ -50,7 +57,8 @@ class Button extends EngineObject {
             }
         })
         this.selected = true;
-        console.log(`${this.constructor.name} selected`);
+        // console.log(`${this.constructor.name} selected`);
+        buttonClickSound.play();
     }
 }
 
@@ -65,6 +73,8 @@ class CharInfo extends EngineObject {
         this.infoOffset = -8;
         this.infoTextIncrement = -2.5;
         this.infoFontSize = 4;
+
+        this.name = "",
 
         this.extraInfo = {
             health: "",
@@ -104,6 +114,8 @@ class CharInfo extends EngineObject {
         } else {
             this.walkFrame = false;
         }
+
+        drawText(this.name, vec2(this.pos.x, this.pos.y + 8), this.infoFontSize, new Color(1, 1, 1), 0.4);
         if (this.displayExtras) {
             const extraInfoY = this.pos.y + this.infoOffset;
             drawText(this.extraInfo.health, vec2(this.pos.x, extraInfoY), this.infoFontSize, this.infoColours.health, 0.4);
@@ -124,6 +136,7 @@ class ReimuInfo extends CharInfo {
     constructor(parentButton, dispExtra) {
         const spriteInfo = tileTable.reimu;
         super(parentButton, spriteInfo, dispExtra);
+        this.name = "Reimu";
         this.extraInfo = {
             health: "80 HP",
             weaponDetail1: "Long-Range",
@@ -146,6 +159,7 @@ class SakuyaInfo extends CharInfo {
     constructor(parentButton, dispExtra) {
         const spriteInfo = tileTable.sakuyaNormal;
         super(parentButton, spriteInfo, dispExtra);
+        this.name = "Sakuya";
         this.extraInfo = {
             health: "100 HP",
             weaponDetail1: "Medium-Range",
@@ -168,6 +182,7 @@ class YoumuInfo extends CharInfo {
     constructor(parentButton, dispExtra) {
         const spriteInfo = tileTable.youmu;
         super(parentButton, spriteInfo, dispExtra);
+        this.name = "Youmu";
         this.fontSize = 4;
         this.extraInfo = {
             health: "120 HP",
@@ -200,13 +215,18 @@ class PowerButton extends Button {
     toggle() {
         this.selected = !this.selected;
         startMaxPower = !startMaxPower;
+        buttonClickSound.play();
     }
 }
 
 class IncrementButton extends Button {
-    constructor(pos, size, text, fontSize, val) {
-        super(pos, size, text, fontSize);
+    constructor(pos, size, text, fontSize, val, buttonType) {
+        super(pos, size, text, fontSize, buttonType);
         this.value = val;
+    }
+    render() {
+        drawRect(this.pos, vec2(this.size.x * 1.2, this.size.y * 1.2), (new Color).setHex("#f73c96"));
+        super.render();
     }
     collideWithObject(o) {
         if (isOverlapping(cursor.pos, cursor.size, this.pos, this.size) && mouseWasPressed(0)) {
@@ -216,6 +236,7 @@ class IncrementButton extends Button {
     }
     increment() {
         waveNum = waveNum === 1 && this.value !== 1 ? clamp(waveNum + this.value - 1, 1, 999) : clamp(waveNum + this.value, 1, 999);
+        buttonClickSound.play();
     }
 }
 
@@ -252,26 +273,26 @@ function clearCurrentMenu() {
 function makeMenuScreen(state) {
     clearCurrentMenu();
     if (state !== menuStates.mainScreen) {
-        backButton = new Button(vec2(-28, -25), vec2(10, 10), "Back");
+        backButton = new Button(vec2(-28.5, -26), vec2(8, 8), "{{");
         menuButtons.push(backButton);
     }
     switch (state) {
         case menuStates.mainScreen:
             menuState = menuStates.mainScreen;
-            endlessButton = new Button(vec2(0, 10), vec2(30, 10), "Endless Mode");
-            customGameButton = new Button(vec2(0, -2), vec2(30, 10), "Custom Game");
-            instructionsButton = new Button(vec2(0, -14), vec2(30, 10), "How to Play")
+            endlessButton = new Button(vec2(0, 5), vec2(30, 10), "Endless Mode", undefined, "hasBorder");
+            customGameButton = new Button(vec2(0, -7.5), vec2(30, 10), "Custom Game", undefined, "hasBorder");
+            instructionsButton = new Button(vec2(0, -20), vec2(30, 10), "How to Play", undefined, "hasBorder")
             menuButtons.push(endlessButton);
             menuButtons.push(customGameButton);
             menuButtons.push(instructionsButton);
             break;
         case menuStates.characterSelect:
             menuState = menuStates.characterSelect;
-            reimuButton = new Button(vec2(-21, 5), vec2(19, 30)/*, "Reimu"*/);
+            reimuButton = new Button(vec2(-21, 4), vec2(19, 31)/*, "Reimu"*/);
             reimuInfo = new ReimuInfo(reimuButton, true);
-            sakuyaButton = new Button(vec2(0, 5), vec2(19, 30)/*, "Sakuya"*/);
+            sakuyaButton = new Button(vec2(0, 4), vec2(19, 31)/*, "Sakuya"*/);
             sakuyaInfo = new SakuyaInfo(sakuyaButton, true);
-            youmuButton = new Button(vec2(21, 5), vec2(19, 30)/*, "Youmu"*/)
+            youmuButton = new Button(vec2(21, 4), vec2(19, 31)/*, "Youmu"*/)
             youmuInfo = new YoumuInfo(youmuButton, true);
             startGameButton = new Button(vec2(0, -25), vec2(18, 8), "Start")
             
@@ -408,7 +429,7 @@ class CriticalHitScreen extends EngineObject {
         this.alphaScale -= 0.01;
         this.color = this.color.setHSLA(0, 1, 0.5, this.alphaScale);
         if (this.alphaScale <= 0) {
-            console.log("destroyed");
+            // console.log("destroyed");
             this.destroy();
         }
     }
@@ -476,4 +497,14 @@ function pauseHandler() {
 function bgMusicStartStop(start) {
     if (start) audioContext.resume();
     else audioContext.suspend();
+}
+
+function drawMenuBg() {
+    // for (let x = -levelSize.x; x < levelSize.x; x += 6) {
+    //     for (let y = -levelSize.y; y < levelSize.y; y += 6) {
+    //         drawTile(vec2(x,y), vec2(6), bgTile.frame(3));
+    //     }
+    // }
+    const bgTileInfo = tile(tileTable.menuBg, 400, 3).frame(0)
+    drawTile(vec2(0), vec2(6), bgTileInfo);
 }

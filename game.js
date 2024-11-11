@@ -35,6 +35,7 @@ let gamePaused = false;
 let pauseScreenCreated = false;
 
 let menuMusicStarted = false;
+let failSoundPlayed = false;
 
 let screenShake = 0;
 
@@ -109,6 +110,7 @@ const myonRespawnSound = new Sound([2.0,,278,.02,.05,.11,,2.5,10,,,,,,,,,.56,.05
 //
 const reimuShootSound = new Sound([0.3,,510,,.01,.11,,1.4,2.9,-91,-50,,.01,,,,,.54,,,-978]); // Random 155 - Mutation 1 
 const reimuBombSound = new Sound([.2,0,540,.05,.3,.07,,3.2,,47,,,.02,,6.7,,,.9,.18,,-525]); // Powerup 1797
+const reimuBombDestroySound = new Sound([.6,0,232,.01,.11,.49,1,.4,,,,,.07,,.3,,,.78,.12]); // Powerup 2006
 // const youmuShootSound = new Sound([.7,0,285,.01,,.09,,,40.6,,-250,.02,,1.1,2,,,.66,.02,.2,-1166]); // Jump 495
 
 const sakuyaShootSound = new Sound([.7,0,73.41619,,,.09,,,40.6,,-650,,,1.1,2,,,.5,,.2,-1166]); // Jump 495
@@ -118,6 +120,7 @@ const timeStopTick = new Sound([,,523.2511,,,.03,,,,,,-0.02,,,,,,1.5]); // Music
 // const timeStopEnd = new Sound([2,0,130.8128,.13,.66,.35,,1.6,,,,,,.1,,,.14,.32,.02,,-1428]); // Music 1123
 const timeStopEnd = new Sound([,,652,.05,.19,.47,,2.4,,174,-107,.09,.05,,,,,.54,.18,.43]); // Powerup 1131
 
+const buttonClickSound = new Sound([0.2,0,9,.01,.02,.03,,2.6,16,,,,,.1,,,,.97,.02]); // Blip 1954 
 const pickupSound = new Sound([0.6,,523.2511,,,.01]); // Random 1359
 const pauseSound = new Sound([1.1,0,43,.01,.04,.03,,4.8,,,,,,,,,,.72,.02]); // Blip 1393
 const specialNotReadySound = new Sound([1.2,0,10,.01,.04,.05,1,.5,-81,5,,.01,-0.01,,,,.02,.42,,,-1338]); // Blip 1503 - Mutation 1
@@ -140,6 +143,7 @@ document.addEventListener("click", (e) => {
     });
 });
 
+
 const tileTable = {
     //tiles.png (textureIndex = 0)
     sakuyaNormal: vec2(0, defaultEntitySize * 0),
@@ -154,6 +158,7 @@ const tileTable = {
     railGunner: vec2(0, defaultEntitySize * 7),
 
     bg1: vec2(0, defaultTileSize * 8),
+    orb: vec2(0, defaultTileSize * 9),
     
     //==============================
     
@@ -167,8 +172,6 @@ const tileTable = {
     //particles.png (textureIndex = 2)
     playerParticles: vec2(0, defaultItemProjSize * 0),
 
-    //==============================
-    //bgTiles.png (textureIndex = 3)
 };
 // (0,0) starts at the bottom left (???)
 
@@ -204,6 +207,9 @@ function prepGame() {
     new Wall(vec2(0, levelSize.y/2), vec2(levelSize.x, 1)); // top wall
     new Wall(vec2(0, -levelSize.y/2), vec2(levelSize.x, 1)); // bottom wall
 
+    cursor.destroy();
+    cursor = undefined;
+
     menuMusic.stop();
     menuMusicStarted = false;
     
@@ -215,8 +221,8 @@ function startGame() {
         const waveDetails = getWaveDetails(waveNum);
         totalEnemies = waveDetails.enemies;
         totalMaxEnemies = totalEnemies;
-        console.log(`Wave ${waveNum} started.`);
-        console.log(waveDetails);
+        // console.log(`Wave ${waveNum} started.`);
+        // console.log(waveDetails);
         waveInProgress = true;
         startWave(waveNum);
     } else if (totalEnemies === 0) {
@@ -225,6 +231,7 @@ function startGame() {
     }   
     
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit()
@@ -236,9 +243,11 @@ function gameInit()
     cameraScale = 16 * 2;
     // document.getElementById('canvas').addEventListener("click", (event) => audioContext.resume());
     // menuMusic.play(null, 0.5, null, null, true);
+
+
     
     // draw main menu
-    drawRect(vec2(0, 0), levelSize.scale(2), new Color(0.2, 0, 0.2, 1));
+    // drawRect(vec2(0, 0), levelSize.scale(2), new Color(0.2, 0, 0.2, 1));
     makeMenuScreen(menuStates.mainScreen);
     cursor = new Cursor();
        
@@ -250,7 +259,16 @@ function gameUpdate()
     //position of rect is the middle of its shape
     // drawRect(vec2(0,0), levelSize, (new Color).setHex("#1e4a2a"));
     // console.log(totalEnemies)
-    drawRect(vec2(0, 0), levelSize.scale(2), new Color(0.2, 0, 0.2, 1));
+    // drawRect(vec2(0, 0), levelSize.scale(2), new Color(0.2, 0, 0.2, 1));
+    // drawMenuBg();
+    //
+    if (!gameStarted) {
+        mainContext.drawImage(menuBg, 0, 0, 2100, 2100);
+        if (menuState === menuStates.mainScreen) {
+            mainContext.drawImage(logo, 450, 100, 1200, 480);
+            drawText("*This is a Touhou Project fan game. Touhou Project is the property of Team Shanghai Alice", vec2(0, -28), 2.5, new Color(1, 1, 1), 0.5);
+        } 
+    }
     menuSelectionHandler();
     
     if (startGameButton.selected && !gameStarted) {
@@ -263,13 +281,23 @@ function gameUpdate()
         } else {
             prepGame();
             clearCurrentMenu();
-            cursor.destroy();
         }
     }
+    failSoundPlayed = false;
     
     if (menuState === menuStates.customGame && !gameStarted) {
+        drawText("Custom Game", vec2(0, 27), 10, new Color(1, 1, 1), 0.5);
         drawText("Starting Wave", vec2(-15, -3), 6, new Color(1, 1, 1), 0.4);
         drawText(waveNum, vec2(-15, -7), 10, new Color(1, 1, 1), 0.4);
+    } else if (menuState === menuStates.characterSelect && !gameStarted) {
+        drawText("Endless Mode", vec2(0, 27), 10, new Color(1, 1, 1), 0.5);
+    } else if (menuState === menuStates.instructions && !gameStarted) {
+        drawText("How To Play", vec2(0, 27), 10, new Color(1, 1, 1), 0.5);
+
+        drawText("Objective", vec2(-20, 20), 8, new Color(1, 1, 1), 0.4);
+        drawText("Survive as many waves as possible and get the highest score!", vec2(-0, 15), 3.5, new Color(1, 1, 1), 0.4);
+        drawText("Controls", vec2(-20, 10), 8, new Color(1, 1, 1), 0.4);
+        mainContext.drawImage(instructions, 118, 700, 1864, 1072);
     }
 
     if (screenShake > 0) {
@@ -289,7 +317,6 @@ function gameUpdate()
 
     // Back to menu handler
     if (gameOver && keyWasPressed("Enter")) {
-        console.log("hello");
         gameStarted = false; 
         gameOver = false;
         cameraPos = vec2(0, 0);
@@ -308,7 +335,7 @@ function gameUpdate()
         bgYoumu.stop();
         menuMusic.play(null, 1, null, null, true);
         menuMusicStarted = true;
-        console.log(player);
+        // console.log(player);
     }
 }
 
@@ -350,4 +377,4 @@ function gameRenderPost()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
-engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['assets/tiles.png', 'assets/projectileItems.png', 'assets/particles.png', 'assets/bgTiles.png']);
+engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['assets/tiles.png', 'assets/projectileItems.png', 'assets/particles.png']);

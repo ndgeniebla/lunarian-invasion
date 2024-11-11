@@ -6,7 +6,7 @@ async function spawnEnemy(enemyType, target, spawnDelay) {
             if (timeStopped || gameOver || !gameStarted || gamePaused) {
                 resolve("not spawned");
             } else {
-                console.log(`${enemyType.name} spawned`);
+                // console.log(`${enemyType.name} spawned`);
                 // new ParticleEmitter(randSpawn, 0, 0, 8, 0.5, 1.2, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(4), new Color(0.11, 0.118, 0.149, 1), new Color(0.11, 0.118, 0.149, 1), new Color(0.651, 0.667, 0.741, 0.5), new Color(0.475, 0.541, 0.608, 0.5), 1, 1, 2, 0.25, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
                 // new ParticleEmitter(this.pos, 0, 6, 0.1, 50, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(2), new Color(0.502, 1, 0, 1), new Color(0.502, 1, 0, 1), new Color(0.976, 0.941, 0.749, 0), new Color(0.976, 0.941, 0.749, 0), 0.2, 1, 0.5, 0.05, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
                 new enemyType(randSpawn, target);
@@ -31,7 +31,7 @@ async function spawnHandler(enemyType, spawnAmount, spawnDelay, target) {
         }
         // console.log("enemy spawned");
     }
-    return console.log(`All ${enemyType.name} spawned!`);
+    return console.log(""/*`All ${enemyType.name} spawned!`*/);
 }
 
 function getWaveDetails(waveNum) {

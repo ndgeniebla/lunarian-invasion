@@ -220,7 +220,7 @@ class ThrowingKnives extends PlayerWeapon {
                 setTimeout(() => {
                     const randomDeviation = rand(0, this.maxDeviation);
                     const spreadVel = vel.rotate(randomDeviation);
-                    sakuyaShootSound.play();
+                    if (!gamePaused) sakuyaShootSound.play();
                     new KnifeProjectile(this.pos, spreadVel, vec2(1,2), spreadVel.angle(), this.damage, new Color(0, 255, 0), this.bulletLifeTimeCap);
                 }, this.throwDelay * (i + 1));
             }
@@ -487,7 +487,7 @@ class Projectile extends EngineObject {
     collideWithObject(o) {
         const parentObject = Object.getPrototypeOf(o.constructor).name;
         if (this.hitParticleAttributes && parentObject === "PlayerChar" && !timeStopped && !gamePaused) {
-            console.log("hitParticles");
+            // console.log("hitParticles");
             new ParticleEmitter(
                 this.pos,
                 this.hitParticleAttributes.angle,
@@ -761,6 +761,8 @@ class ReimuBomb extends EngineObject {
         
         if (this.lifeTime <= 0) {
             reimuBombSound.stop();
+            new ParticleEmitter(this.pos, 0, 2, 0.2, 80, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(4), new Color(1, 1, 1, 1), new Color(0, 0, 0, 1), new Color(0, 0, 0, 0), new Color(1, 1, 1, 0), 1, 8, 3, 0.4, 0, 1, 0, 0, 0, 0.01, 0.2, 0, 0, 1);
+            reimuBombDestroySound.play();
             this.destroy();
             this.lifeTime = this.lifeTimeCap;
         }
@@ -771,6 +773,11 @@ class ReimuBomb extends EngineObject {
             o.destroy();
         }
         return 1;
+    }
+    render() {
+        this.tileInfo = tile(tileTable.orb, 12 * 2 * 3).frame(0);
+        drawTile(this.pos, vec2(32), this.tileInfo, undefined, this.angle);
+        // drawTile(this.pos, this.drawSize, this.tileInfo, undefined, this.angle - 0.9);
     }
 }
 

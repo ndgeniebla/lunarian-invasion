@@ -164,7 +164,7 @@ class PlayerChar extends EngineObject {
                 this.specialCountingDown = false;
                 if (this.specialOnCooldown && !gamePaused && !gameOver) {
                     this.specialTimer = clamp(this.specialTimer + 1, 0, this.cooldownDuration/1000);
-                    console.log(this.specialTimer);
+                    // console.log(this.specialTimer);
                     if (timeStopped) {
                         timeStopTick.play();
                     }
@@ -189,7 +189,7 @@ class PlayerChar extends EngineObject {
         const velVec = vec2(velXY[0]*projectileSpeed, velXY[1]*projectileSpeed);
         const angle = velVec.angle();
         new PierceProjectile(this.pos, velVec, vec2(10, 20), angle, 9999, new Color(255, 255, 0), this.bulletLifeTimeCap);
-        console.log("Special ability used");
+        // console.log("Special ability used");
         this.specialOnCooldown = true;
         // this.specialOnCooldown = await this.specialCooldown();
     }
@@ -236,14 +236,14 @@ class PlayerChar extends EngineObject {
         
         if ((this.specialTimer === this.cooldownDuration / 1000) && this.specialOnCooldown) {
             this.specialOnCooldown = false;
-            console.log("Special is now ready!");
+            // console.log("Special is now ready!");
         }
 
         this.focusModeHandler();
         if (this.health <= 0) {
             this.health = 0;
             deathSound.play();
-            new ParticleEmitter(this.pos, 0, 2, 0.2, 20, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(3), new Color(1, 0.043, 0.067, 1), new Color(1, 0.043, 0.067, 1), new Color(1, 0.043, 0.067, 0), new Color(1, 0.043, 0.067, 0), 1, 4, 4, 0.3, 0, 1, 0, 0, 0, 0.01, 0.2, 0, 0, 1);
+            new ParticleEmitter(this.pos, 0, 2, 0.2, 80, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(3), new Color(1, 0.043, 0.067, 1), new Color(1, 0.043, 0.067, 1), new Color(1, 0.043, 0.067, 0), new Color(1, 0.043, 0.067, 0), 1, 4, 4, 0.3, 0, 1, 0, 0, 0, 0.01, 0.2, 0, 0, 1);
             this.destroy();
         }
 
@@ -251,7 +251,7 @@ class PlayerChar extends EngineObject {
             if (!this.specialOnCooldown) {
                 this.useSpecial();
             } else {
-                console.log("Special on cooldown!");
+                // console.log("Special on cooldown!");
                 specialNotReadySound.play();
                 // new StatusText(this.pos, this, "Special Not Ready", 3.5, (new Color).setHex("#fc44fc"));
             }
@@ -317,7 +317,7 @@ class PlayerReimu extends PlayerChar {
            this.recoveringBlessing = true;
            new ParticleEmitter(this.pos, 0, 10, 0.2, 50, 3.14, tile(tileTable.playerParticles, defaultItemProjSize, 2).frame(2), new Color(0.502, 1, 0, 1), new Color(0.502, 1, 0, 1), new Color(0.976, 0.941, 0.749, 0), new Color(0.976, 0.941, 0.749, 0), 0.3, 1, 4, 0.05, 0.05, 1, 1, 0, 3.14, 0.1, 0.2, 0, 0, 1);
            blessingBreakSound.play();
-           console.log("blessing broken, on cooldown...");
+        //    console.log("blessing broken, on cooldown...");
            await this.blessingRecover();
        }
    }
@@ -328,9 +328,9 @@ class PlayerReimu extends PlayerChar {
        const velXY = calcVel2Pos(mousePos, cameraPos.x, cameraPos.y);
        const velVec = vec2(velXY[0]*projectileSpeed, velXY[1]*projectileSpeed);
        new ReimuBomb(this.pos, velVec);
-       console.log("Special ability used");
+    //    console.log("Special ability used");
        this.specialOnCooldown = true;
-       console.log("Special on cooldown");
+    //    console.log("Special on cooldown");
     //    this.specialOnCooldown = await this.specialCooldown();
    }
    update() {
@@ -436,7 +436,7 @@ class PlayerYoumu extends PlayerChar {
         this.specialOnCooldown = true;
         this.dashing = await this.dash();
         // this.specialOnCooldown = await this.specialCooldown();
-        console.log("Special ability used");
+        // console.log("Special ability used");
     }
     myonCooldownTimer() {
         return new Promise((resolve) => {
@@ -445,7 +445,7 @@ class PlayerYoumu extends PlayerChar {
                     this.myon = new Myon(this.pos, this);
                     this.wasHit = false;
                     if (audioContext.state === "running") myonRespawnSound.play();
-                    console.log("myon respawned");
+                    // console.log("myon respawned");
                 }
                 resolve(false);
             }, this.myonRespawnTime);
@@ -454,7 +454,7 @@ class PlayerYoumu extends PlayerChar {
     async myonCooldown() {
         if (this.wasHit === true && this.myonRespawning === false) {
             this.myonRespawning = true;
-            console.log("myon destroyed, waiting for respawn...")
+            // console.log("myon destroyed, waiting for respawn...")
             this.myonRespawning = await this.myonCooldownTimer();
         }
     }
@@ -505,7 +505,7 @@ class PlayerSakuya extends PlayerChar {
         return new Promise((resolve) => {
             setTimeout(() => {
                 this.damageBoosted = false;
-                console.log("damage boost off");
+                // console.log("damage boost off");
                 resolve();
             }, this.damageBoostDuration);
         });
@@ -513,7 +513,7 @@ class PlayerSakuya extends PlayerChar {
     async damageBoost() {
         if (!this.damageBoosted) {
             new StatusText(this.pos, this, "DAMAGE UP", 3.5, (new Color).setHex("#abd1ff"));
-            console.log("damage boosted");
+            // console.log("damage boosted");
             this.damageBoosted = true;
             sakuyaDamageBoostSound.play();
             await this.damageBoostTimer();
@@ -537,7 +537,7 @@ class PlayerSakuya extends PlayerChar {
         this.specialTimer = 0;
         timeStopSound.play();
         await this.stopTime();
-        console.log("Special ability used");
+        // console.log("Special ability used");
         this.specialOnCooldown = true;
         
         // this.specialOnCooldown = await this.specialCooldown();
