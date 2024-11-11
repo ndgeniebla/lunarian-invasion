@@ -62,6 +62,70 @@ class Button extends EngineObject {
     }
 }
 
+class PowerButton extends Button {
+    constructor(pos, size, text, fontSize) {
+        super(pos, size, text, fontSize);
+    }
+    collideWithObject(o) {
+        if (isOverlapping(cursor.pos, cursor.size, this.pos, this.size) && mouseWasPressed(0)) {
+            this.toggle();
+        }
+        return 1;
+    }
+    toggle() {
+        this.selected = !this.selected;
+        startMaxPower = !startMaxPower;
+        buttonClickSound.play();
+    }
+}
+
+class VolumeButton extends Button {
+    constructor(pos, size) {
+        super(pos, size);
+        this.renderOrder = 100;
+    }
+    render() {
+        const volumeFrame = soundEnable ? 3 : 4;
+        const volumeTile = tile(tileTable.bg1, vec2(bgDrawSize)).frame(volumeFrame);
+        drawTile(this.pos, vec2(4), volumeTile);
+        this.velocity = vec2(0);
+    }
+    collideWithObject(o) {
+        if (isOverlapping(cursor.pos, cursor.size, this.pos, this.size) && mouseWasPressed(0)) {
+            this.toggle();
+        }
+        return 1;
+    }
+    toggle() {
+        soundEnable = !soundEnable;
+        if (soundEnable && !gamePaused) audioContext.resume()
+        else audioContext.suspend();
+        // buttonClickSound.play();
+    }
+    
+}
+
+class IncrementButton extends Button {
+    constructor(pos, size, text, fontSize, val, buttonType) {
+        super(pos, size, text, fontSize, buttonType);
+        this.value = val;
+    }
+    render() {
+        drawRect(this.pos, vec2(this.size.x * 1.2, this.size.y * 1.2), (new Color).setHex("#f73c96"));
+        super.render();
+    }
+    collideWithObject(o) {
+        if (isOverlapping(cursor.pos, cursor.size, this.pos, this.size) && mouseWasPressed(0)) {
+            this.increment();
+        }
+        return 1;
+    }
+    increment() {
+        waveNum = waveNum === 1 && this.value !== 1 ? clamp(waveNum + this.value - 1, 1, 999) : clamp(waveNum + this.value, 1, 999);
+        buttonClickSound.play();
+    }
+}
+
 class CharInfo extends EngineObject {
     constructor(parentButton, spriteInfo, dispExtra) {
         const pos = dispExtra ? vec2(parentButton.pos.x, parentButton.pos.y + 6) : parentButton.pos;
@@ -201,45 +265,6 @@ class YoumuInfo extends CharInfo {
         }
     }
 }
-
-class PowerButton extends Button {
-    constructor(pos, size, text, fontSize) {
-        super(pos, size, text, fontSize);
-    }
-    collideWithObject(o) {
-        if (isOverlapping(cursor.pos, cursor.size, this.pos, this.size) && mouseWasPressed(0)) {
-            this.toggle();
-        }
-        return 1;
-    }
-    toggle() {
-        this.selected = !this.selected;
-        startMaxPower = !startMaxPower;
-        buttonClickSound.play();
-    }
-}
-
-class IncrementButton extends Button {
-    constructor(pos, size, text, fontSize, val, buttonType) {
-        super(pos, size, text, fontSize, buttonType);
-        this.value = val;
-    }
-    render() {
-        drawRect(this.pos, vec2(this.size.x * 1.2, this.size.y * 1.2), (new Color).setHex("#f73c96"));
-        super.render();
-    }
-    collideWithObject(o) {
-        if (isOverlapping(cursor.pos, cursor.size, this.pos, this.size) && mouseWasPressed(0)) {
-            this.increment();
-        }
-        return 1;
-    }
-    increment() {
-        waveNum = waveNum === 1 && this.value !== 1 ? clamp(waveNum + this.value - 1, 1, 999) : clamp(waveNum + this.value, 1, 999);
-        buttonClickSound.play();
-    }
-}
-
 class Cursor extends EngineObject {
     constructor() {
         super(mousePos, vec2(0.2));
@@ -281,10 +306,12 @@ function makeMenuScreen(state) {
             menuState = menuStates.mainScreen;
             endlessButton = new Button(vec2(0, 5), vec2(30, 10), "Endless Mode", undefined, "hasBorder");
             customGameButton = new Button(vec2(0, -7.5), vec2(30, 10), "Custom Game", undefined, "hasBorder");
-            instructionsButton = new Button(vec2(0, -20), vec2(30, 10), "How to Play", undefined, "hasBorder")
+            instructionsButton = new Button(vec2(0, -20), vec2(30, 10), "How to Play", undefined, "hasBorder");
+            volumeButton = new VolumeButton(vec2(-30, 27), vec2(6, 6));
             menuButtons.push(endlessButton);
             menuButtons.push(customGameButton);
             menuButtons.push(instructionsButton);
+            menuButtons.push(volumeButton);
             break;
         case menuStates.characterSelect:
             menuState = menuStates.characterSelect;
@@ -479,13 +506,18 @@ function pauseHandler() {
             pauseScreenCreated = true;
             pauseScreen = new PauseScreen();
             pauseSound.play();
+            cursor.setCollision(true, true);
+            volumeButton = new VolumeButton(screenToWorld(vec2(100, 100)), vec2(6, 6));
             bgMusicStartStop(false);
         } else {
             pauseScreenCreated = false;
             pauseScreen.destroy();
+            volumeButton.destroy();
             bgMusicStartStop(true);
+            cursor.setCollision(false, false);
         }
     }
+    // console.log(menuButtons);
     
     if (gamePaused) {
         drawTextScreen(`Paused`, vec2(mainCanvasSize.x/2, mainCanvasSize.y - 220), 180, (new Color).setHex("#ffffff"), 10); 
@@ -495,16 +527,22 @@ function pauseHandler() {
 }
 
 function bgMusicStartStop(start) {
-    if (start) audioContext.resume();
+    if (start && soundEnable) audioContext.resume();
     else audioContext.suspend();
-}
-
-function drawMenuBg() {
-    // for (let x = -levelSize.x; x < levelSize.x; x += 6) {
-    //     for (let y = -levelSize.y; y < levelSize.y; y += 6) {
-    //         drawTile(vec2(x,y), vec2(6), bgTile.frame(3));
-    //     }
-    // }
-    const bgTileInfo = tile(tileTable.menuBg, 400, 3).frame(0)
-    drawTile(vec2(0), vec2(6), bgTileInfo);
+    
+    if (gameStartedNoSound && soundEnable) {
+        // console.log("hello");
+        switch (characterSelected) {
+            case characters.reimu:
+                bgReimu.play(null, 1, null, null, true);
+                break;
+            case characters.sakuya:
+                bgSakuya.play(null, 1, null, null, true);
+                break;
+            case characters.youmu:
+                bgYoumu.play(null, 1, null, null, true);
+                break;
+        }
+        gameStartedNoSound = false;
+    }
 }

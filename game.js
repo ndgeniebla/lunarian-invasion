@@ -36,6 +36,8 @@ let pauseScreenCreated = false;
 
 let menuMusicStarted = false;
 let failSoundPlayed = false;
+let gameStartedNoSound = false;
+let userClickStartCount = 0;
 
 let screenShake = 0;
 
@@ -56,6 +58,7 @@ let maxPowerButton = new Button(vec2(-1000, -1000));
 let instructionsButton = new Button(vec2(-1000, -1000));
 let startGameButton = new Button(vec2(-1000, -1000));
 let backButton = new Button(vec2(-1000, -1000));
+let volumeButton = new Button(vec2(-1000, -1000));
 
 const menuStates = {
     mainScreen: "mainScreen",
@@ -98,8 +101,8 @@ const gunnerShootSound = new Sound([.03,,195.9977,.02,.03,.03,,2.5,,7,,,,,173,,,
 const shotGunnerSound = new Sound([.4,0,174.6141,.05,,.03,1,.6,,9,,,.02,.2,8.8,,,.97,.01]); // Random 1780 
 const boltShootSound = new Sound([0.05,,324,.03,.05,.09,,1.9,-3,-7,,,.04,,,,,.57,.02,,-1497]); // Pickup 1885
 
-const blessingSound = new Sound([2,,398,.03,.24,.09,1,4,,,81,.06,.02,,,,.18,.54,.11]); // Powerup 235
-const blessingBreakSound = new Sound([1.5,,284,.01,.05,.09,2,3.8,5,,,,,.5,,.1,,.78,.1,.04,-2489]); // Hit 369
+const blessingSound = new Sound([1,,398,.03,.24,.09,1,4,,,81,.06,.02,,,,.18,.54,.11]); // Powerup 235
+const blessingBreakSound = new Sound([0.7,,284,.01,.05,.09,2,3.8,5,,,,,.5,,.1,,.78,.1,.04,-2489]); // Hit 369
 
 const youmuShootSound = new Sound([,,173,.03,.01,.02,1,.9,,,50,.14,.01,1,2,,,-0.1,.05,,1]); // Hit 894 - Mutation 4 
 const spiritSlashSound = new Sound([,,44,.03,,.62,3,1.2,7,-8,,,,.2,,.4,,.4,.13,.33,-3496]); // Explosion 143
@@ -135,15 +138,15 @@ const bgSakuya = new SoundWave("assets/sakuya-theme.mp3");
 const bgYoumu = new SoundWave("assets/youmu-theme.mp3");
 
 document.addEventListener("click", (e) => {
-    if (!gameStarted) audioContext.resume().then(() => {
+    if (!menuMusic.isLoading() && soundEnable) userClickStartCount++; // this prevents the user from playing the menu music multiple times
+    //since the below function is async, it's possible to make it resume and play multiple times if the user decides to click multiple times on the home screen
+    if (!gameStarted && !menuMusicStarted && soundEnable && userClickStartCount === 1) audioContext.resume().then(() => {
+        menuMusic.play(null, 1, null, null, true);
+        menuMusicStarted = true;
+        userClickStartCount = 0;
         // console.log("hello")
-        if (!menuMusic.isLoading() && !menuMusicStarted) {
-            menuMusic.play(null, 1, null, null, true);
-            menuMusicStarted = true;
-        }
     });
 });
-
 
 const tileTable = {
     //tiles.png (textureIndex = 0)
@@ -208,8 +211,12 @@ function prepGame() {
     new Wall(vec2(0, levelSize.y/2), vec2(levelSize.x, 1)); // top wall
     new Wall(vec2(0, -levelSize.y/2), vec2(levelSize.x, 1)); // bottom wall
 
-    cursor.destroy();
-    cursor = undefined;
+    // cursor.destroy();
+    // cursor = undefined;
+    
+    cursor.setCollision(false, false);
+    
+    if (!soundEnable) gameStartedNoSound = true;
 
     menuMusic.stop();
     menuMusicStarted = false;
@@ -267,7 +274,7 @@ function gameUpdate()
         mainContext.drawImage(menuBg, 0, 0, 2100, 2100);
         if (menuState === menuStates.mainScreen) {
             mainContext.drawImage(logo, 450, 100, 1200, 480);
-            drawText("*This is a Touhou Project fan game. Touhou Project is the property of Team Shanghai Alice", vec2(0, -28), 2.5, new Color(1, 1, 1), 0.5);
+            drawText("This is a Touhou Project fan game. Touhou Project is the property of Team Shanghai Alice", vec2(0, -28), 2.5, new Color(1, 1, 1), 0.5);
         } 
     }
     menuSelectionHandler();
@@ -329,13 +336,15 @@ function gameUpdate()
         totalPoints = 0;
         startGameButton.selected = false;
         makeMenuScreen(menuStates.mainScreen);
-        cursor = new Cursor();
         player = undefined; // prevents enemies in the next game from targeting the old dead player's position
+        cursor = new Cursor(); //all objects are destroyed so you have to do this, not just setCollision to true
+        cursor.setCollision(true, true);
         bgReimu.stop();
         bgSakuya.stop();
         bgYoumu.stop();
         menuMusic.play(null, 1, null, null, true);
-        menuMusicStarted = true;
+        menuMusicStarted = soundEnable ? true : false;
+        userClickStartCount = 0;
         // console.log(player);
     }
 }
