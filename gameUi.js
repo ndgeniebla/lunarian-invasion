@@ -36,7 +36,7 @@ class Button extends EngineObject {
         }
 
         drawRect(this.pos, this.size, (new Color).setHex("#170118"));
-        drawText(this.text, vec2(this.pos.x, this.pos.y + yPadding), this.fontSize, (new Color).setHex("#ffffff"), 0.4);
+        drawText(this.text, vec2(this.pos.x, this.pos.y + yPadding - (this.fontSize / yWorldTextOffset)), this.fontSize, (new Color).setHex("#ffffff"), 0.4);
         this.velocity = vec2(0, 0);
     }
     collideWithObject(o) {
@@ -475,20 +475,20 @@ class PauseScreen extends EngineObject {
 
 function playerHud() {
     const playerHealth = new Bar(vec2(mainCanvasSize.x / 2, mainCanvasSize.y - 60), 16, player.health, player.maxHealth, new Color(0, 1, 0, 1), 2);
-    drawTextScreen(`${player.health}/${player.maxHealth}`, vec2(mainCanvasSize.x / 2, mainCanvasSize.y - 85), 100, new Color(255, 255, 255), 10);
+    drawTextScreen(`${player.health}/${player.maxHealth}`, vec2(mainCanvasSize.x / 2, mainCanvasSize.y - 85 + yScreenTextOffset), 100, new Color(255, 255, 255), 10);
 
     const powerBar = new Bar(vec2(mainCanvasSize.x / 4, mainCanvasSize.y - 60), 14, player.power, player.maxPower, (new Color).setHex("#ff932e"), 2);
-    drawTextScreen(`${player.power.toFixed(2)}/${player.maxPower.toFixed(2)}`, vec2(mainCanvasSize.x / 4, mainCanvasSize.y - 85), 100, new Color(255, 255, 255), 10);
+    drawTextScreen(`${player.power.toFixed(2)}/${player.maxPower.toFixed(2)}`, vec2(mainCanvasSize.x / 4, mainCanvasSize.y - 85 + yScreenTextOffset), 100, new Color(255, 255, 255), 10);
 
     const waveBar = new Bar(vec2(mainCanvasSize.x / 2, 60), 40, totalEnemies, totalMaxEnemies, (new Color).setHex("#bd0000"), 1.5);
-    drawTextScreen(`Wave ${waveNum}`, vec2(mainCanvasSize.x / 2, 35), 100, new Color(255, 255, 255), 10);
+    drawTextScreen(`Wave ${waveNum}`, vec2(mainCanvasSize.x / 2, 35 + yScreenTextOffset), 100, new Color(255, 255, 255), 10);
 
 
     const specialBar = new Bar(vec2(3 * mainCanvasSize.x / 4, mainCanvasSize.y - 60), 14, player.specialTimer, player.cooldownDuration / 1000, (new Color).setHex("#3b6fff"), 2);
     if (!player.specialOnCooldown) {
-        drawTextScreen(`SPECIAL READY`, vec2(3 * mainCanvasSize.x / 4, mainCanvasSize.y - 85), 100, new Color(255, 255, 255), 10);
+        drawTextScreen(`SPECIAL READY`, vec2(3 * mainCanvasSize.x / 4, mainCanvasSize.y - 85 + yScreenTextOffset), 100, new Color(255, 255, 255), 10);
     } else {
-        drawTextScreen(`${player.cooldownDuration / 1000 - player.specialTimer}`, vec2(3 * mainCanvasSize.x / 4, mainCanvasSize.y - 85), 100, new Color(255, 255, 255), 10);
+        drawTextScreen(`${player.cooldownDuration / 1000 - player.specialTimer}`, vec2(3 * mainCanvasSize.x / 4, mainCanvasSize.y - 85 + yScreenTextOffset), 100, new Color(255, 255, 255), 10);
     }
 
     drawTextScreen(`${totalPoints}`, vec2(mainCanvasSize.x/2, 110), 100, (new Color).setHex("#ffd52b"), 10); 

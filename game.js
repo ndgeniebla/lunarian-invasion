@@ -59,6 +59,18 @@ let instructionsButton = new Button(vec2(-1000, -1000));
 let startGameButton = new Button(vec2(-1000, -1000));
 let backButton = new Button(vec2(-1000, -1000));
 let volumeButton = new Button(vec2(-1000, -1000));
+let yWorldTextOffset;
+let yScreenTextOffset;
+
+// fixes discrepancy between Windows drawText and other OSes
+if (window.navigator.userAgent.indexOf("Windows") != -1) {
+    yWorldTextOffset = Infinity;
+    yScreenTextOffset = 0;
+    
+} else {
+    yWorldTextOffset = 6.6666667;
+    yScreenTextOffset = 16;
+}
 
 const menuStates = {
     mainScreen: "mainScreen",
