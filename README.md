@@ -25,7 +25,8 @@ Survive as many waves as possible and get the highest score!
 
 ## Known Issues
 
-- No music plays on Linux using Chromium (does work on Firefox though!)
+- No music plays on Linux using Chromium (but it does work on Firefox)
+- Game does not run on MacOS using Safari (works on Chrome)
 
 ## Credits
 Touhou Project is the property of Team Shanghai Alice. I've adhered to the [Guidelines for Touhou Project Fan Creators](https://touhou-project.news/guidelines_en/) to the best of my ability.
