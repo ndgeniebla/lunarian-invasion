@@ -23,6 +23,10 @@ Survive as many waves as possible and get the highest score!
 ![](https://github.com/ndgeniebla/lunarian-invasion/blob/master/assets/readme/preview2.jpg?raw=true)
 ![](https://github.com/ndgeniebla/lunarian-invasion/blob/master/assets/readme/preview3.jpg?raw=true)
 
+## Known Issues
+
+- No music plays on Linux using Chromium (does work on Firefox though!)
+
 ## Credits
 Touhou Project is the property of Team Shanghai Alice. I've adhered to the [Guidelines for Touhou Project Fan Creators](https://touhou-project.news/guidelines_en/) to the best of my ability.
 
